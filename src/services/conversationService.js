@@ -25,7 +25,7 @@ export const saveSession = async (sessionId, history, unreadCount = 0, needsInte
                 needs_intervention = EXCLUDED.needs_intervention,
                 last_updated = CURRENT_TIMESTAMP;
         `;
-        await pool.query(query, [sessionId, history, unreadCount, needsIntervention]);
+        await pool.query(query, [sessionId, JSON.stringify(history), unreadCount, needsIntervention]);
     } catch (error) {
         console.error('Error saving session:', error);
     }
