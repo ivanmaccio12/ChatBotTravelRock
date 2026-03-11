@@ -1,0 +1,390 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;700;900&display=swap');
+
+:root {
+  --bg-color: #0f1115;
+  --bg-surface: rgba(25, 28, 36, 0.7);
+  --bg-card: rgba(25, 28, 36, 0.9);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.1);
+
+  /* Travel Rock Colors */
+  --brand-primary: #0045b9;
+  --brand-secondary: #0dcaf0;
+
+  /* Status */
+  --status-active: #10b981;
+  --status-paused: #ef4444;
+
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --transition-normal: 200ms ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  background-image: radial-gradient(circle at 15% 50%, rgba(0, 69, 185, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 30%, rgba(13, 202, 240, 0.05) 0%, transparent 50%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  padding: 1.5rem 2rem;
+  max-width: 1800px;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.logo-area h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: white;
+}
+
+.logo-area h1 span {
+  color: var(--brand-secondary);
+}
+
+.logo-area p {
+  color: var(--brand-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* CRM STYLES */
+.crm-container {
+  display: flex;
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  height: calc(100vh - 120px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.crm-sidebar {
+  width: 340px;
+  background: rgba(15, 17, 21, 0.6);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+}
+
+.crm-sidebar-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.crm-sidebar-header h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.crm-conversation-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.crm-conversation-item {
+  padding: 1.2rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background var(--transition-normal);
+}
+
+.crm-conversation-item:hover {
+  background: var(--bg-hover);
+}
+
+.crm-conversation-item.active {
+  background: rgba(0, 69, 185, 0.15);
+  border-left: 3px solid var(--brand-primary);
+}
+
+.crm-conv-name {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.crm-conv-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crm-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.crm-status-dot.active {
+  background-color: var(--status-active);
+}
+
+.crm-status-dot.paused {
+  background-color: var(--status-paused);
+}
+
+.crm-conv-badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.badge.unread {
+  background: var(--brand-primary);
+  color: white;
+}
+
+.badge.warning {
+  background: #fbbf24;
+  color: black;
+}
+
+.crm-empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem;
+  font-size: 0.9rem;
+}
+
+.crm-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.crm-chat-header {
+  padding: 1.25rem 1.5rem;
+  background: rgba(15, 17, 21, 0.6);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crm-chat-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.crm-chat-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
+  font-family: inherit;
+}
+
+.btn-action:hover {
+  opacity: 0.8;
+}
+
+.btn-pause {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-resume {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.btn-clear {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.crm-chat-messages {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.crm-message {
+  display: flex;
+  max-width: 75%;
+}
+
+.msg-user {
+  align-self: flex-start;
+}
+
+.msg-bot {
+  align-self: flex-end;
+}
+
+.msg-bubble {
+  padding: 0.85rem 1.2rem;
+  border-radius: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.95rem;
+}
+
+.msg-user .msg-bubble {
+  background: rgba(255, 255, 255, 0.08);
+  border-bottom-left-radius: 2px;
+  border: 1px solid var(--border-subtle);
+}
+
+.msg-bot .msg-bubble {
+  background: linear-gradient(135deg, var(--brand-primary), #1e3a8a);
+  color: #fff;
+  border-bottom-right-radius: 2px;
+  box-shadow: 0 4px 15px rgba(0, 69, 185, 0.3);
+}
+
+.crm-chat-input-area {
+  padding: 1.25rem 1.5rem;
+  background: rgba(15, 17, 21, 0.6);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.crm-input-form {
+  display: flex;
+  gap: 1rem;
+}
+
+.crm-input {
+  flex: 1;
+  padding: 0.85rem 1.2rem;
+  border-radius: 24px;
+  border: 1px solid var(--border-light);
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color var(--transition-normal);
+}
+
+.crm-input:focus {
+  outline: none;
+  border-color: var(--brand-secondary);
+}
+
+.crm-btn-send {
+  background: var(--brand-primary);
+  color: white;
+  border: none;
+  padding: 0 1.5rem;
+  border-radius: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-normal);
+  font-family: inherit;
+}
+
+.crm-btn-send:hover:not(:disabled) {
+  background: #003694;
+}
+
+.crm-btn-send:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.crm-no-selection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.crm-no-selection-content h3 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: white;
+  font-family: 'Outfit', sans-serif;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.1rem;
+  color: var(--brand-secondary);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}

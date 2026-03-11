@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta de Automatización con IA - Travel Rock</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --surface-color: rgba(25, 28, 36, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --brand-primary: #0045b9;
+            /* AXIS SC_Blue */
+            --brand-secondary: #0dcaf0;
+            --text-primary: #f8f9fa;
+            --text-secondary: #a0aab2;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* Layout preparado para A4 en PDF */
+        .page-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 15mm 20mm;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(0, 69, 185, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(13, 202, 240, 0.05) 0%, transparent 50%);
+        }
+
+        /* Nav Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .logo span {
+            color: var(--brand-primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+
+        .hero h1 span {
+            color: var(--brand-primary);
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            page-break-inside: avoid;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(0, 69, 185, 0.15);
+            color: var(--brand-secondary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            border-radius: 100px;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(0, 69, 185, 0.3);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .col-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.8rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .col-card.highlight {
+            border: 1px solid var(--brand-primary);
+            background: linear-gradient(180deg, rgba(0, 69, 185, 0.08) 0%, rgba(0, 0, 0, 0.4) 100%);
+        }
+
+        .col-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .col-card.highlight h3 {
+            color: var(--brand-primary);
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .feature-list li i {
+            margin-top: 0.2rem;
+        }
+
+        .col-card:not(.highlight) .feature-list li i {
+            color: #ffb74d;
+        }
+
+        .col-card.highlight .feature-list li i {
+            color: var(--brand-primary);
+        }
+
+        .feature-list li strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        /* Architecture Section */
+        .architecture {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .arch-step {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .arch-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 69, 185, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 1.5rem;
+            color: var(--brand-primary);
+        }
+
+        .arch-step h4 {
+            font-size: 1.15rem;
+            margin-bottom: 0.8rem;
+            color: #fff;
+        }
+
+        .arch-step p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer-section {
+            text-align: center;
+            padding: 3rem 0 1rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+            page-break-inside: avoid;
+        }
+
+        .footer-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        @media print {
+            body {
+                background-color: #0f1115 !important;
+            }
+
+            .page-container {
+                box-shadow: none;
+                margin: 0;
+            }
+
+            .panel {
+                background: rgba(25, 28, 36, 1) !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-container">
+        <header>
+            <div class="logo">AXIS<span>.ST</span></div>
+            <div style="text-align: right;">
+                <div
+                    style="color: var(--brand-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                    Propuesta Tecnológica</div>
+                <div style="color: #fff; font-size: 1.1rem;">Para <strong>Travel Rock</strong></div>
+            </div>
+        </header>
+
+        <section class="hero">
+            <h1>El futuro de la atención al pasajero es <span>Inteligente</span></h1>
+            <p>Por qué evolucionar hacia un Chatbot con Inteligencia Artificial frente a los tradicionales árboles de
+                decisión predefinidos.</p>
+        </section>
+
+        <div class="panel"
+            style="border-left: 4px solid var(--brand-primary); background: linear-gradient(90deg, rgba(0, 69, 185, 0.08) 0%, rgba(25, 28, 36, 0.7) 100%);">
+            <span class="section-tag" style="background: var(--brand-primary); color: #fff; border: none;">¿Quiénes
+                Somos?</span>
+            <h2 class="section-title" style="font-size: 1.8rem;">AXIS - Soluciones Tecnológicas</h2>
+            <p style="color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 1rem;">
+                Somos especialistas en automatizar y aumentar la eficiencia de negocios mediante <strong>chatbots
+                    personalizados con integración directa a WhatsApp</strong> y tecnologías de Inteligencia Artificial.
+            </p>
+            <p style="color: var(--text-secondary); font-size: 1.05rem;">
+                Nuestro enfoque prioriza el acompañamiento: brindamos soporte técnico continuo, diseño a medida de la
+                empresa y análisis de datos para asegurar respuestas instantáneas, atención 24/7 y la mayor tasa de
+                conversión posible.
+            </p>
+        </div>
+
+        <div class="panel">
+            <span class="section-tag">Análisis del Flujo Actual</span>
+            <h2 class="section-title">El límite de los flujos rígidos</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 1.05rem;">
+                En los modelos tradicionales de chatbot, el flujo se apoya en un árbol de decisión estricto: solicitar
+                DNI, enviar enlaces a la app, derivar a pagos o post-venta mediante botones estáticos. Esto genera una
+                experiencia limitante para el usuario final.
+            </p>
+
+            <div class="comparison-grid">
+                <div class="col-card">
+                    <h3><i class="fa-solid fa-code-branch"></i> Enfoque Tradicional</h3>
+                    <ul class="feature-list">
+                        <li>
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <div>
+                                <strong>Navegación Rígida</strong>
+                                El usuario debe seguir menús y botones. Si escribe texto libre fuera del libreto, el bot
+                                se confunde y falla.
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <div>
+                                <strong>Respuestas Genéricas</strong>
+                                Incapacidad para comprender el contexto de las dudas específicas o reclamos detallados
+                                de pasajeros y tutores.
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <div>
+                                <strong>Alta Fricción Operativa</strong>
+                                Requiere la actualización manual y constante del flujo cada vez que cambian URLs,
+                                promociones o reglas de viaje.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-card highlight">
+                    <h3><i class="fa-solid fa-brain"></i> Nuestra Tecnología IA</h3>
+                    <ul class="feature-list">
+                        <li>
+                            <i class="fa-solid fa-check-circle"></i>
+                            <div>
+                                <strong>Comprensión del Lenguaje Natural</strong>
+                                Entiende texto libre, audios y contextos complejos. El usuario interactúa conversando de
+                                forma natural.
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-check-circle"></i>
+                            <div>
+                                <strong>Resolución Contextualizada</strong>
+                                Puede solicitar el DNI amigablemente, validar pagos en tiempo real y brindar respuestas
+                                únicas según el caso.
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-check-circle"></i>
+                            <div>
+                                <strong>Integración Dinámica</strong>
+                                Arquitectura que se conecta directo a bases de datos y CRMs sin necesidad de rehacer
+                                flujos visuales por cada cambio.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom: 2rem;">
+            <span class="section-tag">Nuestra Solución</span>
+            <h2 class="section-title">¿Cómo lo implementamos?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 1.05rem;">
+                Desplegamos un agente virtual autónomo impulsado por grandes modelos de lenguaje (LLM), orquestado
+                mediante infraestructura de flujos dinámicos y bases de datos vectoriales.
+            </p>
+
+            <div class="architecture">
+                <div class="arch-step">
+                    <div class="arch-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                    <h4>1. Recepción Activa</h4>
+                    <p>La IA recibe el mensaje de WhatsApp, analiza la intención real y categoriza la urgencia del
+                        requerimiento.</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-icon"><i class="fa-solid fa-database"></i></div>
+                    <h4>2. Consulta Inmediata</h4>
+                    <p>El sistema busca en milisegundos en políticas internas, bases de datos o documentación para
+                        formular la respuesta correcta.</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-icon"><i class="fa-solid fa-robot"></i></div>
+                    <h4>3. Respuesta y Acción</h4>
+                    <p>Genera una comunicación empática, entrega enlaces relevantes y si detecta un caso crítico, lo
+                        escala de inmediato a un humano.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="border-color: var(--brand-primary); background: rgba(0, 69, 185, 0.05);">
+            <h2 class="section-title" style="margin-bottom: 0.8rem; font-size: 1.8rem;">La Ventaja Exclusiva de Axis
+            </h2>
+            <p style="color: var(--text-primary); font-size: 1.05rem; margin-bottom: 1rem;">
+                A diferencia de los servicios enlatados tradicionales, entregamos una plataforma propia con arquitectura
+                <strong>Enterprise</strong>.
+            </p>
+            <ul
+                style="color: var(--text-secondary); padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; font-size: 1rem;">
+                <li><strong>Sin costos ocultos:</strong> Libres de licencias restrictivas de constructores de bots
+                    visuales comerciales.</li>
+                <li><strong>Soberanía de datos:</strong> Integración 100% segura; ustedes son dueños de su información
+                    (ej. bases de PostgreSQL u Oracle).</li>
+                <li><strong>Evolución Continua:</strong> El bot aprende automáticamente de nuevos manuales o PDFs
+                    incorporados a su "cerebro" (sistema RAG).</li>
+            </ul>
+        </div>
+
+        <div class="panel"
+            style="background: linear-gradient(135deg, rgba(0, 69, 185, 0.1) 0%, rgba(13, 202, 240, 0.05) 100%); text-align: center; border-color: var(--brand-primary); margin-bottom: 2rem;">
+            <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 0.5rem;">Inversión Transparente</h2>
+            <p style="color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 1.5rem;">Un esquema de costos
+                claro, diseñado para maximizar el ROI desde el primer día.</p>
+
+            <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; flex-wrap: wrap;">
+                <div
+                    style="background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 12px; min-width: 220px; border: 1px solid var(--border-color); flex: 1; max-width: 300px;">
+                    <h3
+                        style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 0.5rem; font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                        Setup Inicial</h3>
+                    <div
+                        style="font-size: 2.5rem; font-weight: 800; color: #fff; font-family: 'Outfit'; line-height: 1;">
+                        $400 <span style="font-size: 1rem; color: var(--text-secondary); font-weight: 400;">USD</span>
+                    </div>
+                    <p style="color: var(--brand-primary); margin-top: 0.8rem; font-size: 0.9rem; font-weight: 600;"><i
+                            class="fa-solid fa-rocket" style="margin-right: 5px;"></i> Pago único</p>
+                </div>
+
+                <div
+                    style="background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 12px; min-width: 220px; border: 1px solid var(--brand-primary); flex: 1; max-width: 300px; position: relative;">
+                    <div
+                        style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--brand-primary); color: #fff; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase;">
+                        Valor Recurrente</div>
+                    <h3
+                        style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 0.5rem; font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                        Mantenimiento e IA</h3>
+                    <div
+                        style="font-size: 2.5rem; font-weight: 800; color: #fff; font-family: 'Outfit'; line-height: 1;">
+                        $75 <span
+                            style="font-size: 1rem; color: var(--text-secondary); font-weight: 400;">USD/mes</span>
+                    </div>
+                    <p style="color: var(--brand-primary); margin-top: 0.8rem; font-size: 0.9rem; font-weight: 600;"><i
+                            class="fa-solid fa-headset" style="margin-right: 5px;"></i> Soporte continuo</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h2 class="footer-title">Preparados para escalar la atención de +1M de pasajeros</h2>
+            <p style="color: var(--text-secondary); font-size: 1rem; max-width: 600px; margin: 0 auto;">
+                Una solución de IA conversacional pensada no solo para responder preguntas, sino para automatizar
+                gestiones reales y blindar la identidad de marca de Travel Rock.
+            </p>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
