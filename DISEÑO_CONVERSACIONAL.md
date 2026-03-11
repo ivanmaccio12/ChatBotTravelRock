@@ -156,3 +156,10 @@ Siguiendo estrictamente los lineamientos y emulando la infraestructura backend c
 4. **Integración CRM de WhatsApp**: Manejo nativo; la plataforma de escritorio/móvil se encarga de reanudar el flujo o permitir intervenir.
 
 > **Nota Comercial**: El uso sistemático de emojis, formato en negritas y claridad visual de los datos bancarios reduce hasta en un 40% el tiempo promedio de atención y la repregunta por parte del pasajero, cumpliendo con creces los objetivos de la solicitud frente al bot original de la competencia.
+
+---
+
+## 5. Extra Context (Web Scrape)
+El bot ha sido inyectado con el conocimiento del sitio web principal para responder FAQs secundarias.
+- **Excursiones:** Ski & Snowboard, Nieve & Sol.
+- **Discos:** Grisú, Genux, Roket, Cerebro, By Pass, Ski Ranch. (Con sus respectivos enlaces cargados).

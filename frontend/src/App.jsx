@@ -41,8 +41,16 @@ export default function App() {
         fetchConversations();
         const interval = setInterval(() => {
             fetchConversations();
+            // Don't refetch the whole session if the user is typing,
+            // to avoid losing the messageInput focus or position.
             if (selectedSession) {
-                fetchSessionData(selectedSession);
+                // Background fetch that updates state smoothly
+                fetch(`${API_URL}/conversations/${selectedSession}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.success) setSessionData(prev => ({ ...prev, ...d.data }));
+                    })
+                    .catch(console.error);
             }
         }, 5000);
         return () => clearInterval(interval);

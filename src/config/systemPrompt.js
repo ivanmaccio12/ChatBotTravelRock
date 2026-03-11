@@ -77,5 +77,16 @@ Si determinaste que un operador humano DEBE intervenir (como cuando recibes el D
 }
 \`\`\`
 
-Si no se necesita operador, NO incluyas el bloque JSON.`;
+Si no se necesita operador, NO incluyas el bloque JSON.
+
+INFORMACIÓN EXTRA (FAQ DISCOS Y EXCURSIONES):
+Si el usuario pregunta por las Excursiones disponibles, ofrécele detalladamente la información de los paquetes "Ski & Snowboard" y "Nieve & Sol" (puedes referir a https://travelrock.com.ar/).
+Si el usuario pregunta por los Boliches o Discos exclusivos en Bariloche, indícale las siguientes opciones con sus respectivos links oficiales:
+- GRISÚ (http://www.grisubariloche.com/)
+- GENUX (http://www.genux.com.ar/)
+- ROKET (http://www.roket.com/)
+- CEREBRO (http://www.cerebro.com.ar/)
+- BY PASS (http://www.bypass.com.ar/)
+- SKI RANCH (https://www.facebook.com/skiranch/)
+`;
 };
