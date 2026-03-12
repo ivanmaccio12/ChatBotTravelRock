@@ -8,8 +8,16 @@ export default function App() {
     const [selectedSession, setSelectedSession] = useState(null);
     const [sessionData, setSessionData] = useState(null);
     const [messageInput, setMessageInput] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [filePreview, setFilePreview] = useState(null);
+    const [sending, setSending] = useState(false);
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        return () => { if (filePreview) URL.revokeObjectURL(filePreview); };
+    }, [filePreview]);
 
     const fetchConversations = async () => {
         try {
@@ -110,27 +118,56 @@ export default function App() {
         }
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setSelectedFile(file);
+        setFilePreview(file.type.startsWith('image/') ? URL.createObjectURL(file) : null);
+    };
+
+    const clearSelectedFile = () => {
+        setSelectedFile(null);
+        setFilePreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
     const sendMessage = async (e) => {
         e.preventDefault();
-        if (!messageInput.trim() || !selectedSession) return;
+        if ((!messageInput.trim() && !selectedFile) || !selectedSession) return;
+        if (sessionData?.status !== 'paused') return;
 
+        setSending(true);
         const text = messageInput;
-        setMessageInput('');
+        const file = selectedFile;
 
-        const newHistory = [...(sessionData?.history || []), { role: 'assistant', content: text }];
-        setSessionData({ ...sessionData, history: newHistory, status: 'paused', needs_intervention: false });
+        const optimisticContent = text || `[Archivo adjunto: ${file?.name}]`;
+        setSessionData({ ...sessionData, history: [...(sessionData?.history || []), { role: 'assistant', content: optimisticContent }], needs_intervention: false });
+        setMessageInput('');
+        setSelectedFile(null);
+        setFilePreview(null);
 
         try {
-            await fetch(`${API_URL}/conversations/${selectedSession}/send`, {
+            const formData = new FormData();
+            if (text) formData.append('message', text);
+            if (file) formData.append('file', file);
+
+            const res = await fetch(`${API_URL}/conversations/${selectedSession}/send`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
+                body: formData
             });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Error desconocido');
+            }
+
             fetchConversations();
         } catch (err) {
             console.error("Failed to send message", err);
-            alert("Error enviando mensaje. Revisa conectividad o n8n.");
+            alert(`Error enviando mensaje: ${err.message}`);
             fetchSessionData(selectedSession);
+        } finally {
+            setSending(false);
         }
     };
 
@@ -207,7 +244,23 @@ export default function App() {
                                         sessionData.history.map((msg, idx) => (
                                             <div key={idx} className={`crm-message ${msg.role === 'user' ? 'msg-user' : 'msg-bot'}`}>
                                                 <div className="msg-bubble">
-                                                    {msg.content}
+                                                    {msg.mediaUrl && msg.mediaType?.startsWith('image/') && (
+                                                        <img src={msg.mediaUrl} alt={msg.mediaName || 'imagen'} className="msg-media-img" />
+                                                    )}
+                                                    {msg.mediaUrl && msg.mediaType === 'application/pdf' && (
+                                                        <a href={msg.mediaUrl} target="_blank" rel="noreferrer" className="msg-media-link">
+                                                            📄 {msg.mediaName || 'Documento PDF'}
+                                                        </a>
+                                                    )}
+                                                    {msg.mediaUrl && msg.mediaType?.startsWith('video/') && (
+                                                        <video src={msg.mediaUrl} controls className="msg-media-video" />
+                                                    )}
+                                                    {msg.mediaUrl && msg.mediaType?.startsWith('audio/') && (
+                                                        <audio src={msg.mediaUrl} controls className="msg-media-audio" />
+                                                    )}
+                                                    {msg.content && !msg.content.startsWith('[Archivo adjunto:') && (
+                                                        <span>{msg.content}</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))
@@ -218,7 +271,33 @@ export default function App() {
                                 </div>
 
                                 <div className="crm-chat-input-area">
+                                    {selectedFile && (
+                                        <div className="crm-file-preview">
+                                            {filePreview
+                                                ? <img src={filePreview} alt="preview" className="crm-preview-img" />
+                                                : <span className="crm-preview-name">📎 {selectedFile.name}</span>
+                                            }
+                                            <button className="crm-preview-clear" onClick={clearSelectedFile} title="Quitar archivo">✕</button>
+                                        </div>
+                                    )}
                                     <form onSubmit={sendMessage} className="crm-input-form">
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/3gpp,application/pdf,audio/ogg,audio/mpeg"
+                                            style={{ display: 'none' }}
+                                            disabled={sessionData.status !== 'paused'}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="crm-btn-attach"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={sessionData.status !== 'paused'}
+                                            title="Adjuntar archivo"
+                                        >
+                                            📎
+                                        </button>
                                         <input
                                             type="text"
                                             placeholder={sessionData.status === 'paused' ? "Escribe un mensaje..." : "Para escribir un mensaje, pausa el bot primero..."}
@@ -227,8 +306,12 @@ export default function App() {
                                             className="crm-input"
                                             disabled={sessionData.status !== 'paused'}
                                         />
-                                        <button type="submit" className="crm-btn-send" disabled={sessionData.status !== 'paused' || !messageInput.trim()}>
-                                            Enviar
+                                        <button
+                                            type="submit"
+                                            className="crm-btn-send"
+                                            disabled={sessionData.status !== 'paused' || (!messageInput.trim() && !selectedFile) || sending}
+                                        >
+                                            {sending ? '...' : 'Enviar'}
                                         </button>
                                     </form>
                                 </div>
