@@ -32,15 +32,18 @@ const upload = multer({
     }),
     limits: { fileSize: 25 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
+        // Solo tipos compatibles con WhatsApp
         const allowed = [
-            'image/jpeg', 'image/png', 'image/webp', 'image/gif',
-            'video/mp4', 'video/3gpp',
+            'image/jpeg', 'image/png', 'image/webp',
+            'video/mp4',
             'application/pdf',
-            'audio/ogg', 'audio/mpeg'
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'audio/ogg', 'audio/mpeg', 'audio/aac'
         ];
         allowed.includes(file.mimetype)
             ? cb(null, true)
-            : cb(new Error(`Tipo de archivo no permitido: ${file.mimetype}`));
+            : cb(new Error(`Tipo no permitido. Solo imágenes (JPG/PNG/WEBP), MP4, PDF, Word y audio.`));
     }
 });
 

@@ -247,9 +247,9 @@ export default function App() {
                                                     {msg.mediaUrl && msg.mediaType?.startsWith('image/') && (
                                                         <img src={msg.mediaUrl} alt={msg.mediaName || 'imagen'} className="msg-media-img" />
                                                     )}
-                                                    {msg.mediaUrl && msg.mediaType === 'application/pdf' && (
+                                                    {msg.mediaUrl && (msg.mediaType === 'application/pdf' || msg.mediaType?.includes('word')) && (
                                                         <a href={msg.mediaUrl} target="_blank" rel="noreferrer" className="msg-media-link">
-                                                            📄 {msg.mediaName || 'Documento PDF'}
+                                                            📄 {msg.mediaName || 'Documento'}
                                                         </a>
                                                     )}
                                                     {msg.mediaUrl && msg.mediaType?.startsWith('video/') && (
@@ -285,7 +285,7 @@ export default function App() {
                                             type="file"
                                             ref={fileInputRef}
                                             onChange={handleFileChange}
-                                            accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/3gpp,application/pdf,audio/ogg,audio/mpeg"
+                                            accept="image/jpeg,image/png,image/webp,video/mp4,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,audio/ogg,audio/mpeg,audio/aac"
                                             style={{ display: 'none' }}
                                             disabled={sessionData.status !== 'paused'}
                                         />
