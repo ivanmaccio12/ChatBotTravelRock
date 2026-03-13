@@ -213,6 +213,13 @@ body {
   font-weight: 600;
 }
 
+.crm-chat-header-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
 .crm-chat-actions {
   display: flex;
   gap: 0.5rem;
@@ -534,20 +541,37 @@ body {
     display: none;
   }
 
+  /* Fix scroll: los flex children necesitan min-height: 0 */
+  .crm-main {
+    min-height: 0;
+    overflow: hidden;
+  }
+
   .crm-message {
     max-width: 90%;
   }
 
+  /* Header en 2 filas en mobile */
   .crm-chat-header {
+    flex-direction: column;
+    align-items: stretch;
     padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .crm-chat-header-top {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
   }
 
   .crm-chat-title {
     font-size: 0.95rem;
+    flex: 1;
   }
 
   .crm-chat-actions {
+    display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
   }
@@ -555,6 +579,8 @@ body {
   .btn-action {
     padding: 0.4rem 0.65rem;
     font-size: 0.8rem;
+    flex: 1;
+    text-align: center;
   }
 
   .crm-chat-messages {

@@ -223,8 +223,10 @@ export default function App() {
                         sessionData ? (
                             <>
                                 <div className="crm-chat-header">
-                                    <button className="btn-mobile-back" onClick={() => setSelectedSession(null)} title="Volver">←</button>
-                                    <div className="crm-chat-title">{selectedSession}</div>
+                                    <div className="crm-chat-header-top">
+                                        <button className="btn-mobile-back" onClick={() => setSelectedSession(null)} title="Volver">←</button>
+                                        <div className="crm-chat-title">{selectedSession}</div>
+                                    </div>
                                     <div className="crm-chat-actions">
                                         {sessionData.needs_intervention && (
                                             <button className="btn-action btn-clear" onClick={clearIntervention} title="Ocultar advertencia">

@@ -10,7 +10,7 @@ export const getConversationsList = async (req, res) => {
         const result = await pool.query(
             `SELECT session_id, status, unread_count, needs_intervention, last_updated as updated_at 
              FROM travelrock_conversations 
-             WHERE last_updated >= NOW() - INTERVAL '24 HOURS'
+             WHERE last_updated >= NOW() - INTERVAL '30 DAYS'
              ORDER BY last_updated DESC`
         );
         res.json({ success: true, data: result.rows });
