@@ -19,3 +19,4 @@ update_key.js
 # Frontend
 frontend/node_modules/
 frontend/dist/
+.claude/

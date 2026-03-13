@@ -182,7 +182,7 @@ export default function App() {
                 </div>
             </header>
             
-            <div className="crm-container">
+            <div className={`crm-container${selectedSession ? ' mobile-chat-view' : ''}`}>
                 <div className="crm-sidebar">
                     <div className="crm-sidebar-header">
                         <h2>Chats Activos</h2>
@@ -223,6 +223,7 @@ export default function App() {
                         sessionData ? (
                             <>
                                 <div className="crm-chat-header">
+                                    <button className="btn-mobile-back" onClick={() => setSelectedSession(null)} title="Volver">←</button>
                                     <div className="crm-chat-title">{selectedSession}</div>
                                     <div className="crm-chat-actions">
                                         {sessionData.needs_intervention && (
