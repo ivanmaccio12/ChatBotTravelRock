@@ -14,6 +14,7 @@ export default function App() {
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+    const prevHistoryLengthRef = useRef(0);
 
     useEffect(() => {
         return () => { if (filePreview) URL.revokeObjectURL(filePreview); };
@@ -65,12 +66,17 @@ export default function App() {
     }, [selectedSession]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        const currentLength = sessionData?.history?.length ?? 0;
+        if (currentLength > prevHistoryLengthRef.current) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+        prevHistoryLengthRef.current = currentLength;
     }, [sessionData?.history]);
 
     const handleSelectConversation = async (sessionId) => {
         setSelectedSession(sessionId);
         setSessionData(null);
+        prevHistoryLengthRef.current = 0;
         await fetchSessionData(sessionId);
 
         const conv = conversations.find(c => c.session_id === sessionId);
