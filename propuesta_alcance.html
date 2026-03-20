@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alcance del Proyecto — Travel Rock Bot &amp; CRM | AXIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #0045b9;
+      --blue-dark:  #162737;
+      --blue-deep:  #000024;
+      --bg-light:   #f3f5fa;
+      --text-body:  #494949;
+      --text-head:  #162737;
+      --white:      #ffffff;
+      --border:     #dde3f0;
+      --tag-bg:     #e8edf8;
+      --tag-text:   #0045b9;
+      --caution-bg: #fff8e6;
+      --caution-bd: #f0b429;
+      --caution-tx: #7a5700;
+      --radius-sm:  6px;
+      --radius-md:  12px;
+      --radius-lg:  18px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-body);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    /* ─── Header ───────────────────────────────────────────────── */
+    header {
+      background: var(--blue-dark);
+      color: var(--white);
+      padding: 52px 48px 44px;
+    }
+
+    .header-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .brand-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-label::before {
+      content: '';
+      display: inline-block;
+      width: 28px;
+      height: 2px;
+      background: var(--blue);
+    }
+
+    header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    header h1 span {
+      color: var(--blue);
+    }
+
+    .header-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 400;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 28px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .meta-value {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    /* ─── Layout ───────────────────────────────────────────────── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+
+    /* ─── Section ──────────────────────────────────────────────── */
+    section {
+      margin-bottom: 48px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .section-number {
+      background: var(--blue);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-head);
+      letter-spacing: -0.3px;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-head);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 10px;
+      margin-top: 24px;
+    }
+
+    p {
+      margin-bottom: 14px;
+      color: var(--text-body);
+    }
+
+    /* ─── Card ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px 32px;
+    }
+
+    .card + .card {
+      margin-top: 16px;
+    }
+
+    /* ─── Feature List ─────────────────────────────────────────── */
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .feature-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .feature-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--tag-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feature-icon svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--blue);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feature-text strong {
+      color: var(--text-head);
+      font-weight: 600;
+    }
+
+    /* ─── Input Table ──────────────────────────────────────────── */
+    .input-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .input-table thead tr {
+      border-bottom: 2px solid var(--blue);
+    }
+
+    .input-table th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .input-table td {
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text-body);
+    }
+
+    .input-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .input-table tr:hover td {
+      background: var(--bg-light);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .badge-required {
+      background: #fde8e8;
+      color: #c53030;
+    }
+
+    .badge-optional {
+      background: var(--tag-bg);
+      color: var(--tag-text);
+    }
+
+    /* ─── Timeline ─────────────────────────────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 9px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -28px;
+      top: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--blue);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timeline-dot.filled {
+      background: var(--blue);
+    }
+
+    .timeline-dot svg {
+      width: 9px;
+      height: 9px;
+      stroke: var(--white);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .timeline-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-head);
+      margin-bottom: 4px;
+    }
+
+    .timeline-phase {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--blue);
+      margin-bottom: 6px;
+    }
+
+    /* ─── Notice Box ───────────────────────────────────────────── */
+    .notice {
+      border-radius: var(--radius-md);
+      padding: 22px 26px;
+      border-left: 4px solid;
+      background: var(--caution-bg);
+      border-color: var(--caution-bd);
+    }
+
+    .notice-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--caution-tx);
+      margin-bottom: 8px;
+    }
+
+    .notice p {
+      color: var(--caution-tx);
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+
+    /* ─── Highlight Box ────────────────────────────────────────── */
+    .highlight-box {
+      background: var(--blue-dark);
+      color: var(--white);
+      border-radius: var(--radius-md);
+      padding: 28px 32px;
+    }
+
+    .highlight-box h3 {
+      color: rgba(255,255,255,0.55);
+      margin-top: 0;
+    }
+
+    .highlight-box p {
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 0;
+    }
+
+    .highlight-box strong {
+      color: var(--white);
+    }
+
+    /* ─── Grid ─────────────────────────────────────────────────── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      header { padding: 36px 24px 32px; }
+      header h1 { font-size: 24px; }
+      .meta-row { gap: 18px; }
+    }
+
+    /* ─── Divider ──────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 48px 0;
+    }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    footer {
+      background: var(--blue-deep);
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 12.5px;
+      letter-spacing: 0.03em;
+    }
+
+    footer strong {
+      color: rgba(255,255,255,0.75);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════════════════ -->
+<header>
+  <div class="header-inner">
+    <div class="brand-label">AXIS · Propuesta de Proyecto</div>
+    <h1>Chatbot IA de Posventa + CRM<br /><span>Travel Rock</span></h1>
+    <p class="header-sub">Documento de alcance, entregables e información requerida del cliente</p>
+    <div class="meta-row">
+      <div class="meta-item">
+        <span class="meta-label">Cliente</span>
+        <span class="meta-value">Travel Rock</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Emisor</span>
+        <span class="meta-value">AXIS · axis-st.com</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Fecha</span>
+        <span class="meta-value">Marzo 2026</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Canal</span>
+        <span class="meta-value">WhatsApp Business API</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ═══════════════ 1. ¿QUÉ ES EL PROYECTO? ════════════════════ -->
+  <section>
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2>¿Qué es este proyecto?</h2>
+    </div>
+
+    <div class="card">
+      <p>Travel Rock contará con un <strong>asistente automático por WhatsApp</strong> que atiende a sus clientes las 24 horas, los 7 días de la semana — sin intervención humana para las consultas habituales de posventa.</p>
+      <p>El sistema detecta automáticamente cuándo una conversación requiere atención personalizada y <strong>le pasa el control a un asesor humano</strong>, quien puede continuar el chat directamente desde un panel web moderno (el CRM). En cuanto el asesor resuelve la consulta, el bot retoma su rol de forma automática.</p>
+      <p style="margin-bottom:0">En síntesis: un empleado digital siempre disponible, con escalado inteligente a personas reales cuando el momento lo requiere.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 2. QUÉ INCLUYE ════════════════════════════ -->
+  <section>
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2>¿Qué incluye el desarrollo?</h2>
+    </div>
+
+    <div class="grid-2">
+
+      <div class="card">
+        <h3>🤖 El Bot de WhatsApp</h3>
+        <ul class="feature-list">
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Responde mensajes de clientes <strong>automáticamente</strong> en WhatsApp.</span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text"><strong>Inteligencia Artificial</strong> (Claude de Anthropic) entrenada con los flujos de atención y guiones propios de Travel Rock.</span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Recuerda el <strong>historial de cada conversación</strong>; no olvida lo que el cliente dijo antes.</span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Detecta el <strong>momento de cierre o venta</strong> y los casos que requieren asesor humano.</span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text"><strong>Disponible 24/7.</strong> Sin horarios, sin ausencias.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🖥️ Panel de Gestión (CRM)</h3>
+        <ul class="feature-list">
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Interfaz web accesible desde el navegador, <strong>sin instalar nada.</strong></span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Los asesores ven <strong>todas las conversaciones en tiempo real.</strong></span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Pueden <strong>tomar el control</strong> de un chat y responder manualmente al cliente.</span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Pueden <strong>pausar el bot</strong> cuando lo necesiten y reactivarlo al finalizar.</span>
+          </li>
+          <li>
+            <span class="feature-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>
+            <span class="feature-text">Los mensajes del asesor <strong>llegan al cliente por WhatsApp</strong> de forma transparente.</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3>☁️ Infraestructura y Alojamiento</h3>
+      <p>El sistema entero queda alojado en un <strong>servidor dedicado</strong> (VPS) de alta disponibilidad. Esto garantiza que el bot funcione sin interrupciones y con reinicio automático ante cualquier falla. No se requiere que Travel Rock gestione ningún servidor; AXIS se ocupa de toda la infraestructura técnica.</p>
+      <p style="margin-bottom:0">El código fuente queda guardado en un <strong>repositorio privado</strong> con historial completo de cambios, lo que permite revertir modificaciones o auditar el sistema en cualquier momento.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 3. FLUJO DE TRABAJO ════════════════════════ -->
+  <section>
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2>¿Cómo funciona en la práctica?</h2>
+    </div>
+
+    <div class="card">
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="timeline-dot filled">
+            <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg>
+          </div>
+          <div class="timeline-phase">Paso 1</div>
+          <div class="timeline-title">El cliente escribe por WhatsApp</div>
+          <p>Cualquier mensaje entrante al número de Travel Rock es recibido automáticamente por el sistema. No hay demora ni horario de atención.</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot filled">
+            <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg>
+          </div>
+          <div class="timeline-phase">Paso 2</div>
+          <div class="timeline-title">La IA analiza y responde</div>
+          <p>El bot, entrenado con los guiones y procedimientos de Travel Rock, genera una respuesta personalizada y la envía al cliente en segundos.</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot filled">
+            <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg>
+          </div>
+          <div class="timeline-phase">Paso 3 (cuando aplica)</div>
+          <div class="timeline-title">Escalado a asesor humano</div>
+          <p>Si la IA detecta que la situación requiere atención personalizada (reclamo complejo, oportunidad de cierre, solicitud especial), notifica al equipo. Un asesor toma el control desde el CRM y continúa la conversación directamente.</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">
+            <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="transparent" stroke="white" stroke-width="1.5"/></svg>
+          </div>
+          <div class="timeline-phase">Paso 4</div>
+          <div class="timeline-title">El bot retoma el control</div>
+          <p style="margin-bottom:0">Una vez que el asesor finaliza, el bot vuelve a estar activo para esa conversación, manteniendo continuidad sin necesidad de que el cliente lo perciba.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════ 4. QUÉ NECESITAMOS DEL CLIENTE ══════════════ -->
+  <section>
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2>¿Qué necesitamos de Travel Rock?</h2>
+    </div>
+
+    <p>Para que el sistema funcione correctamente desde el primer día, Travel Rock debe proveer los siguientes elementos. Cuanto antes se entreguen, más rápido puede avanzar el desarrollo.</p>
+
+    <div class="card">
+      <table class="input-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Elemento requerido</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td><strong>1</strong></td>
+            <td><strong>Acceso a la API oficial de WhatsApp Business</strong></td>
+            <td>Número de teléfono verificado en la plataforma de Meta (Facebook) para que el bot pueda enviar y recibir mensajes. Requiere una cuenta de empresa activa en Meta Business Suite.</td>
+            <td><span class="badge badge-required">Requerido</span></td>
+          </tr>
+
+          <tr>
+            <td><strong>2</strong></td>
+            <td><strong>Token de acceso y credenciales de Meta</strong></td>
+            <td>Clave de acceso permanente (Access Token) y el ID del número de teléfono generados desde Meta for Developers. AXIS provee instrucciones detalladas para obtenerlo.</td>
+            <td><span class="badge badge-required">Requerido</span></td>
+          </tr>
+
+          <tr>
+            <td><strong>3</strong></td>
+            <td><strong>Guiones y flujos de atención de posventa</strong></td>
+            <td>Documentos, manuales o capturas de pantalla que describan cómo el equipo actual atiende a los clientes: preguntas frecuentes, respuestas estándar, escalados y procesos. Es el "cerebro" que la IA aprenderá a seguir.</td>
+            <td><span class="badge badge-required">Requerido</span></td>
+          </tr>
+
+          <tr>
+            <td><strong>4</strong></td>
+            <td><strong>Tono y personalidad del bot</strong></td>
+            <td>Indicación sobre el estilo de comunicación deseado: formal/informal, nombre del asistente virtual, si debe despedirse de cierta forma, si puede usar emojis, etc.</td>
+            <td><span class="badge badge-required">Requerido</span></td>
+          </tr>
+
+          <tr>
+            <td><strong>5</strong></td>
+            <td><strong>Lista de asesores y accesos al CRM</strong></td>
+            <td>Nombre y correo electrónico de las personas que utilizarán el panel de gestión para atender conversaciones escaladas.</td>
+            <td><span class="badge badge-required">Requerido</span></td>
+          </tr>
+
+          <tr>
+            <td><strong>6</strong></td>
+            <td><strong>Casos de uso y situaciones especiales</strong></td>
+            <td>Ejemplos de conversaciones reales o escenarios típicos: consultas frecuentes, quejas comunes, solicitudes de reembolso, cambios de reserva, etc. Esto mejora la precisión del bot desde el inicio.</td>
+            <td><span class="badge badge-optional">Recomendado</span></td>
+          </tr>
+
+          <tr>
+            <td><strong>7</strong></td>
+            <td><strong>Logotipo e identidad visual (para el CRM)</strong></td>
+            <td>Logotipo y colores corporativos de Travel Rock para personalizar el panel de gestión y darle una apariencia acorde a la marca.</td>
+            <td><span class="badge badge-optional">Recomendado</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════ 5. CRONOGRAMA Y CONDICIONES ════════════════ -->
+  <section>
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <h2>Cronograma y condiciones comerciales</h2>
+    </div>
+
+    <div class="card">
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="timeline-dot filled">
+            <svg viewBox="0 0 10 10"><polyline points="2,5 4.5,7.5 8,2.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="timeline-phase">Hito 1 · Inicio del desarrollo</div>
+          <div class="timeline-title">Pago del 50% del monto acordado</div>
+          <p>Una vez acreditado el primer pago, AXIS da inicio formal al desarrollo. En este punto se solicitan todos los materiales e insumos detallados en la sección anterior.</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">
+            <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="transparent" stroke="white" stroke-width="1.5"/></svg>
+          </div>
+          <div class="timeline-phase">Durante el mes de desarrollo</div>
+          <div class="timeline-title">Construcción, configuración y pruebas internas</div>
+          <p>AXIS desarrolla e integra todas las piezas del sistema: el bot, el CRM, la infraestructura y los flujos de conversación. Se realizan pruebas internas exhaustivas antes de la entrega.</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">
+            <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="transparent" stroke="white" stroke-width="1.5"/></svg>
+          </div>
+          <div class="timeline-phase">Hito 2 · Entrega del sistema · 30 días</div>
+          <div class="timeline-title">Pago del 50% restante + entrega en producción</div>
+          <p>Una vez acreditado el segundo pago, el sistema queda activo y disponible para Travel Rock. Se realiza una sesión de presentación y capacitación al equipo.</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">
+            <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="transparent" stroke="white" stroke-width="1.5"/></svg>
+          </div>
+          <div class="timeline-phase">Garantía incluida · Posterior a la entrega</div>
+          <div class="timeline-title">Período de correcciones sin costo</div>
+          <p style="margin-bottom:0">Durante el mes posterior a la entrega, Travel Rock puede reportar cualquier error o comportamiento inesperado que se detecte en uso real. AXIS corrige sin cargo adicional. Pasado ese período, las modificaciones se evalúan según sus características.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top: 20px;">
+      <div class="notice-title">⚠️ Importante</div>
+      <p>El plazo de un mes comienza a contar desde la acreditación del <strong>primer pago</strong>. La entrega puntual depende también de que Travel Rock provea los materiales requeridos (guiones, accesos de WhatsApp) dentro de los primeros días de iniciado el proyecto.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 6. RESUMEN EJECUTIVO ════════════════════════ -->
+  <section>
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <h2>Resumen ejecutivo</h2>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Lo que Travel Rock obtiene</h3>
+      <p>Un sistema completo de atención al cliente por WhatsApp que funciona <strong>solo, sin intervención humana permanente</strong>, con la inteligencia para saber cuándo derivar a una persona. Incluye el panel de gestión para que los asesores puedan intervenir en cualquier momento, y toda la infraestructura necesaria para que funcione de forma continua y confiable.</p>
+      <br />
+      <p>El sistema es <strong>entregado en 30 días</strong> desde el primer pago, con un mes de garantía para resolver cualquier ajuste que surja en el uso real.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════════ -->
+<footer>
+  Documento preparado por <strong>AXIS</strong> · <a href="https://axis-st.com" style="color:rgba(255,255,255,0.55); text-decoration:none;">axis-st.com</a> · Confidencial — para uso exclusivo de Travel Rock
+</footer>
+
+</body>
+</html>

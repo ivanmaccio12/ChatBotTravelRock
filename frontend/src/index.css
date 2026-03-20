@@ -1,26 +1,64 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;700;900&display=swap');
 
+/* ==== THEME VARIABLES ==== */
 :root {
+  --brand-primary: #0045b9;
+  --brand-secondary: #0dcaf0;
+  --status-active: #10b981;
+  --status-paused: #ef4444;
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --transition-normal: 200ms ease;
+}
+
+[data-theme="dark"] {
   --bg-color: #0f1115;
   --bg-surface: rgba(25, 28, 36, 0.7);
   --bg-card: rgba(25, 28, 36, 0.9);
   --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-sidebar: rgba(15, 17, 21, 0.6);
+  --bg-main: rgba(0, 0, 0, 0.2);
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
+  --text-heading: #ffffff;
   --border-subtle: rgba(255, 255, 255, 0.05);
   --border-light: rgba(255, 255, 255, 0.1);
+  --body-gradient-1: rgba(0, 69, 185, 0.08);
+  --body-gradient-2: rgba(13, 202, 240, 0.05);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+  --input-bg: rgba(0, 0, 0, 0.3);
+  --msg-user-bg: rgba(255, 255, 255, 0.08);
+  --btn-disabled-bg: rgba(255, 255, 255, 0.1);
+  --btn-disabled-color: #94a3b8;
+  --theme-toggle-bg: rgba(255, 255, 255, 0.08);
+  --theme-toggle-border: rgba(255, 255, 255, 0.15);
+  --theme-toggle-color: #94a3b8;
+}
 
-  /* Travel Rock Colors */
-  --brand-primary: #0045b9;
-  --brand-secondary: #0dcaf0;
-
-  /* Status */
-  --status-active: #10b981;
-  --status-paused: #ef4444;
-
-  --border-radius: 12px;
-  --border-radius-sm: 8px;
-  --transition-normal: 200ms ease;
+[data-theme="light"] {
+  --bg-color: #eef2ff;
+  --bg-surface: rgba(255, 255, 255, 0.85);
+  --bg-card: rgba(255, 255, 255, 0.97);
+  --bg-hover: rgba(0, 69, 185, 0.05);
+  --bg-sidebar: rgba(232, 238, 255, 0.85);
+  --bg-main: rgba(215, 225, 255, 0.2);
+  --text-primary: #0f1523;
+  --text-secondary: #475569;
+  --text-heading: #0a0f1e;
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border-light: rgba(0, 0, 0, 0.14);
+  --body-gradient-1: rgba(0, 69, 185, 0.06);
+  --body-gradient-2: rgba(13, 202, 240, 0.04);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.18);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.28);
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --msg-user-bg: rgba(0, 69, 185, 0.07);
+  --btn-disabled-bg: rgba(0, 0, 0, 0.07);
+  --btn-disabled-color: #94a3b8;
+  --theme-toggle-bg: rgba(0, 0, 0, 0.05);
+  --theme-toggle-border: rgba(0, 0, 0, 0.15);
+  --theme-toggle-color: #475569;
 }
 
 * {
@@ -32,12 +70,13 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--bg-color);
-  background-image: radial-gradient(circle at 15% 50%, rgba(0, 69, 185, 0.08) 0%, transparent 50%),
-                    radial-gradient(circle at 85% 30%, rgba(13, 202, 240, 0.05) 0%, transparent 50%);
+  background-image: radial-gradient(circle at 15% 50%, var(--body-gradient-1) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 30%, var(--body-gradient-2) 0%, transparent 50%);
   color: var(--text-primary);
   min-height: 100vh;
   margin: 0;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 250ms ease, color 250ms ease;
 }
 
 .app-container {
@@ -64,7 +103,7 @@ body {
   font-size: 2rem;
   font-weight: 900;
   letter-spacing: -0.02em;
-  color: white;
+  color: var(--text-heading);
 }
 
 .logo-area h1 span {
@@ -77,6 +116,28 @@ body {
   font-size: 0.9rem;
   letter-spacing: 1px;
   text-transform: uppercase;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  background: var(--theme-toggle-bg);
+  border: 1px solid var(--theme-toggle-border);
+  color: var(--theme-toggle-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-normal), color var(--transition-normal), transform var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  transform: rotate(15deg);
 }
 
 /* CRM STYLES */
@@ -94,7 +155,7 @@ body {
 
 .crm-sidebar {
   width: 340px;
-  background: rgba(15, 17, 21, 0.6);
+  background: var(--bg-sidebar);
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
@@ -108,7 +169,7 @@ body {
 .crm-sidebar-header h2 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: white;
+  color: var(--text-heading);
 }
 
 .crm-conversation-list {
@@ -196,12 +257,12 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-main);
 }
 
 .crm-chat-header {
   padding: 1.25rem 1.5rem;
-  background: rgba(15, 17, 21, 0.6);
+  background: var(--bg-sidebar);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
@@ -263,7 +324,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image: radial-gradient(var(--border-subtle) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -290,7 +351,7 @@ body {
 }
 
 .msg-user .msg-bubble {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--msg-user-bg);
   border-bottom-left-radius: 2px;
   border: 1px solid var(--border-subtle);
 }
@@ -304,7 +365,7 @@ body {
 
 .crm-chat-input-area {
   padding: 1.25rem 1.5rem;
-  background: rgba(15, 17, 21, 0.6);
+  background: var(--bg-sidebar);
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -318,8 +379,8 @@ body {
   padding: 0.85rem 1.2rem;
   border-radius: 24px;
   border: 1px solid var(--border-light);
-  background: rgba(0, 0, 0, 0.3);
-  color: white;
+  background: var(--input-bg);
+  color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
   transition: border-color var(--transition-normal);
@@ -347,8 +408,8 @@ body {
 }
 
 .crm-btn-send:disabled {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
+  background: var(--btn-disabled-bg);
+  color: var(--btn-disabled-color);
   cursor: not-allowed;
 }
 
@@ -364,7 +425,7 @@ body {
 .crm-no-selection-content h3 {
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
-  color: white;
+  color: var(--text-heading);
   font-family: 'Outfit', sans-serif;
 }
 
@@ -389,11 +450,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* --- Adjuntos --- */
