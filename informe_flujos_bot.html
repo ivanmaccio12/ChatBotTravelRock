@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TravelRock Bot – Informe de Flujos Conversacionales</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --accent: #e63946;
+      --accent2: #f4a261;
+      --teal: #2ec4b6;
+      --green: #06d6a0;
+      --yellow: #ffd166;
+      --purple: #a78bfa;
+      --text: #e8eaf6;
+      --muted: #8b92b0;
+      --tag-pending: #ff6b35;
+      --tag-ok: #06d6a0;
+      --tag-human: #ffd166;
+      --tag-info: #60a5fa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ============ HEADER ============ */
+    .page-header {
+      background: linear-gradient(135deg, #e63946 0%, #c1121f 50%, #780000 100%);
+      padding: 40px 48px;
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+    .page-header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+    .page-header p { margin-top: 8px; opacity: 0.85; font-size: 15px; }
+    .header-meta { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    }
+    .badge.pending { background: rgba(255,107,53,0.25); border-color: var(--tag-pending); color: var(--tag-pending); }
+    .badge.ok { background: rgba(6,214,160,0.15); border-color: var(--tag-ok); color: var(--tag-ok); }
+    .badge.human { background: rgba(255,209,102,0.15); border-color: var(--tag-human); color: var(--tag-human); }
+
+    /* ============ LAYOUT ============ */
+    .container { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+
+    /* ============ LEGEND ============ */
+    .legend {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      display: flex; flex-wrap: wrap; gap: 20px; align-items: center;
+    }
+    .legend-title { font-weight: 700; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 100%; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+
+    /* ============ PENDIENTES PANEL ============ */
+    .pendientes-panel {
+      background: rgba(255,107,53,0.08);
+      border: 2px solid var(--tag-pending);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+    .pendientes-panel h2 { color: var(--tag-pending); font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .pendientes-list { display: grid; gap: 8px; }
+    .pendiente-item {
+      background: rgba(255,107,53,0.12);
+      border: 1px solid rgba(255,107,53,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .pendiente-num {
+      background: var(--tag-pending);
+      color: white; font-weight: 700; font-size: 11px;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .pendiente-text strong { display: block; color: var(--tag-pending); }
+    .pendiente-text span { color: var(--muted); font-size: 13px; }
+
+    /* ============ SECTION TITLE ============ */
+    .section-title {
+      font-size: 20px; font-weight: 800;
+      padding: 12px 0 16px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label {
+      background: var(--accent);
+      color: white;
+      font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+    .section-label.b { background: var(--teal); }
+    .section-label.c { background: var(--purple); }
+    .section-label.v { background: #475569; }
+
+    /* ============ NODES ============ */
+    .tree { display: flex; flex-direction: column; gap: 0; }
+    .node-row {
+      display: flex;
+      gap: 0;
+    }
+    .node-indent {
+      width: 32px; flex-shrink: 0;
+      position: relative;
+    }
+    .node-indent::before {
+      content: '';
+      position: absolute;
+      left: 15px; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .node-indent-last::before { height: 50%; }
+    .node-indent::after {
+      content: '';
+      position: absolute;
+      left: 15px; top: 50%;
+      width: 17px; height: 2px;
+      background: var(--border);
+    }
+
+    .node {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .node:hover { border-color: var(--accent); }
+    .node.root-node { border-color: var(--accent); border-width: 2px; }
+    .node.promo26 { border-left: 4px solid var(--accent); }
+    .node.promo27 { border-left: 4px solid var(--teal); }
+    .node.faq { border-left: 4px solid var(--purple); }
+    .node.validation { border-left: 4px solid #475569; }
+    .node.handoff { border-left: 4px solid var(--yellow); }
+    .node.leaf { border-left: 4px solid var(--green); }
+
+    .node-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      background: var(--surface2);
+      cursor: pointer;
+      user-select: none;
+    }
+    .node-header:hover { background: rgba(255,255,255,0.04); }
+    .node-id {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      padding: 2px 8px; border-radius: 5px;
+      background: rgba(255,255,255,0.08);
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .node-title { font-weight: 600; font-size: 14px; flex: 1; }
+    .node-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 99px;
+    }
+    .tag.pending { background: rgba(255,107,53,0.2); color: var(--tag-pending); border: 1px solid rgba(255,107,53,0.4); }
+    .tag.human { background: rgba(255,209,102,0.15); color: var(--tag-human); border: 1px solid rgba(255,209,102,0.4); }
+    .tag.ok { background: rgba(6,214,160,0.12); color: var(--tag-ok); border: 1px solid rgba(6,214,160,0.3); }
+    .tag.info { background: rgba(96,165,250,0.12); color: var(--tag-info); border: 1px solid rgba(96,165,250,0.3); }
+    .tag.warn { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.3); }
+    .chevron { color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+    .node-header.open .chevron { transform: rotate(90deg); }
+
+    .node-body { padding: 0; display: none; }
+    .node-body.open { display: block; }
+    .node-section {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .node-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); margin-bottom: 8px;
+    }
+
+    /* Bot message */
+    .bot-message {
+      background: rgba(230,57,70,0.08);
+      border: 1px solid rgba(230,57,70,0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      font-family: inherit;
+    }
+    .bot-message.teal {
+      background: rgba(46,196,182,0.08);
+      border-color: rgba(46,196,182,0.2);
+    }
+    .bot-message.purple {
+      background: rgba(167,139,250,0.08);
+      border-color: rgba(167,139,250,0.2);
+    }
+    .bot-message.yellow {
+      background: rgba(255,209,102,0.08);
+      border-color: rgba(255,209,102,0.2);
+    }
+    .bot-label {
+      font-size: 11px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+    .bot-label.teal { color: var(--teal); }
+    .bot-label.purple { color: var(--purple); }
+    .bot-label.yellow { color: var(--yellow); }
+
+    /* Options */
+    .options-list { display: flex; flex-direction: column; gap: 6px; }
+    .option-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px;
+    }
+    .option-num {
+      width: 22px; height: 22px; border-radius: 6px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted); font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .option-arrow { color: var(--muted); margin-left: auto; font-size: 12px; }
+    .option-tag { margin-left: auto; }
+
+    /* User trigger */
+    .trigger-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .trigger-chip {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Data block */
+    .data-block {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #a8d8ea;
+    }
+    .data-key { color: #7dd3fc; }
+    .data-val { color: #86efac; }
+    .data-pending { color: var(--tag-pending); font-weight: 700; }
+
+    /* Action block */
+    .action-block {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .action-block.human { background: rgba(255,209,102,0.1); color: var(--yellow); border: 1px solid rgba(255,209,102,0.25); }
+    .action-block.auto { background: rgba(6,214,160,0.08); color: var(--green); border: 1px solid rgba(6,214,160,0.2); }
+    .action-block.warn { background: rgba(250,204,21,0.08); color: #facc15; border: 1px solid rgba(250,204,21,0.2); }
+
+    /* Children indent */
+    .children {
+      padding: 0 0 0 24px;
+      border-left: 2px solid var(--border);
+      margin-left: 16px;
+      margin-top: 4px;
+    }
+
+    /* Inline sub-flow */
+    .subflow {
+      display: flex; flex-direction: column; gap: 10px;
+      margin-top: 10px;
+    }
+    .subflow-step {
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .subflow-connector {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0; width: 24px;
+    }
+    .subflow-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--border); flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .subflow-dot.user { background: var(--teal); }
+    .subflow-dot.bot { background: var(--accent); }
+    .subflow-dot.human { background: var(--yellow); }
+    .subflow-dot.validation { background: #6366f1; }
+    .subflow-line {
+      width: 2px; flex: 1; background: var(--border);
+      min-height: 10px; margin-top: 2px;
+    }
+    .subflow-content { flex: 1; padding-bottom: 8px; }
+    .subflow-role {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .subflow-role.user { color: var(--teal); }
+    .subflow-role.bot { color: var(--accent); }
+    .subflow-role.human { color: var(--yellow); }
+    .subflow-role.system { color: #6366f1; }
+
+    /* Highlight pending */
+    .highlight-pending {
+      color: var(--tag-pending);
+      font-weight: 700;
+      background: rgba(255,107,53,0.1);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,107,53,0.3);
+    }
+
+    /* Divider */
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-header { padding: 24px 20px; }
+      .container { padding: 20px 12px; }
+    }
+
+    /* Print friendly */
+    @media print {
+      body { background: white; color: black; }
+      .node { border-color: #ccc; }
+    }
+
+    /* Scrollable areas */
+    .scroll-hint { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+    /* TOC */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+    .toc h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .toc-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .toc-link {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--text);
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .toc-link:hover { border-color: var(--accent); background: rgba(230,57,70,0.08); }
+    .toc-link.b:hover { border-color: var(--teal); background: rgba(46,196,182,0.08); }
+    .toc-link.c:hover { border-color: var(--purple); background: rgba(167,139,250,0.08); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>🤘 TravelRock Bot — Informe de Flujos Conversacionales</h1>
+  <p>Bot: <strong>Rocky</strong> · Plataforma: WhatsApp Business Cloud API · IA: Claude Sonnet · Versión del análisis: Marzo 2026</p>
+  <div class="header-meta">
+    <span class="badge pending">⚠️ 4 formularios pendientes</span>
+    <span class="badge pending">📹 1 video tutorial pendiente</span>
+    <span class="badge pending">🖼️ 1 imagen cupón pendiente</span>
+    <span class="badge ok">✅ Datos bancarios completos</span>
+    <span class="badge human">🙋 5 puntos de derivación humana</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- TABLA DE CONTENIDOS -->
+  <div class="toc">
+    <h3>Índice de Flujos</h3>
+    <div class="toc-list">
+      <a href="#nodo0" class="toc-link">🏠 Nodo 0 – Menú Principal</a>
+      <a href="#promo26" class="toc-link">🔴 Rama A – Promo 26</a>
+      <a href="#a11" class="toc-link">A1.1 Quiero sumarme</a>
+      <a href="#a12" class="toc-link">A1.2 Cupón vencido</a>
+      <a href="#a13" class="toc-link">A1.3 Tasa y Seguro</a>
+      <a href="#a14" class="toc-link">A1.4 Fecha de viaje</a>
+      <a href="#a15" class="toc-link">A1.5 ¿Dónde pago?</a>
+      <a href="#a16" class="toc-link">A1.6 Sin chequera</a>
+      <a href="#a17" class="toc-link">A1.7 Nro Reserva</a>
+      <a href="#a18" class="toc-link">A1.8 Resumen cuenta</a>
+      <a href="#promo27" class="toc-link b">🟢 Rama B – Promo 27</a>
+      <a href="#b11" class="toc-link b">B1.1 Quiero sumarme</a>
+      <a href="#b12" class="toc-link b">B1.2 Cupón vencido</a>
+      <a href="#b13" class="toc-link b">B1.3 Tasa y Seguro</a>
+      <a href="#b14" class="toc-link b">B1.4 ¿Dónde pago?</a>
+      <a href="#b15" class="toc-link b">B1.5 Nro Reserva</a>
+      <a href="#b16" class="toc-link b">B1.6 Resumen cuenta</a>
+      <a href="#faq" class="toc-link c">🟣 Rama C – FAQ</a>
+      <a href="#validaciones" class="toc-link c">⚙️ Validaciones y Fallbacks</a>
+    </div>
+  </div>
+
+  <!-- PENDIENTES -->
+  <div class="pendientes-panel">
+    <h2>⚠️ Puntos Pendientes — Información que falta recibir del cliente</h2>
+    <div class="pendientes-list">
+      <div class="pendiente-item">
+        <div class="pendiente-num">1</div>
+        <div class="pendiente-text">
+          <strong>FORMULARIO_P26_BARILOCHE — Link de Google Form de inscripción</strong>
+          <span>Se menciona en el flujo "Quiero sumarme → Bariloche (Promo 26)". El bot dice "Completá el formulario de inscripción" pero el link aún no fue provisto. Actualmente figura como placeholder <code>[FORMULARIO_P26_BARILOCHE]</code>.</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">2</div>
+        <div class="pendiente-text">
+          <strong>FORMULARIO_P26_CAMBORIU — Link de Google Form de inscripción</strong>
+          <span>Mismo caso para el destino Camboriú Promo 26. Figura como <code>[FORMULARIO_P26_CAMBORIU]</code>.</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">3</div>
+        <div class="pendiente-text">
+          <strong>FORMULARIO_P27_BARILOCHE — Link de Google Form de inscripción</strong>
+          <span>Para inscripción Bariloche Promo 27. Figura como <code>[FORMULARIO_P27_BARILOCHE]</code>.</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">4</div>
+        <div class="pendiente-text">
+          <strong>FORMULARIO_P27_CAMBORIU — Link de Google Form de inscripción</strong>
+          <span>Para inscripción Camboriú Promo 27. Figura como <code>[FORMULARIO_P27_CAMBORIU]</code>.</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">5</div>
+        <div class="pendiente-text">
+          <strong>VIDEO TUTORIAL — App Travel Go</strong>
+          <span>En el nodo "¿Dónde pago?" el bot indica que envía un video tutorial de la app. Este archivo multimedia todavía no fue entregado para cargar al sistema.</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">6</div>
+        <div class="pendiente-text">
+          <strong>IMAGEN — Cupón de chequera con número de reserva/pasajero</strong>
+          <span>En el nodo "Número de reserva/pasajero", el bot envía una imagen de referencia visual que muestra dónde están impresos los números en un cupón. Esta imagen aún no fue provista.</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">7</div>
+        <div class="pendiente-text">
+          <strong>FECHA DE VIAJE Promo 26 — Solo existe contacto telefónico</strong>
+          <span>No hay una fecha cerrada en el sistema. El bot deriva a Juan Ubiña (387-251-9999). Confirmar si eventualmente habrá fecha fija para informar automáticamente.</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">8</div>
+        <div class="pendiente-text">
+          <strong>FECHA DE VIAJE Promo 27 — No contemplada en el menú</strong>
+          <span>La Promo 27 no tiene opción "Fecha de viaje" en su menú. Si el usuario lo consulta, actualmente caería en fallback o derivación humana. ¿Se debe agregar?</span>
+        </div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">9</div>
+        <div class="pendiente-text">
+          <strong>PRECIOS — ¿Se actualizan periódicamente?</strong>
+          <span>Los precios están hardcodeados en el system prompt. ¿Existe un proceso para actualizarlos cuando cambien? Considerar si deben venir de una fuente externa (Google Sheets, etc.).</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEYENDA -->
+  <div class="legend">
+    <div class="legend-title">Leyenda de colores</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Nodo Promo 26</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Nodo Promo 27</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> FAQ / Info general</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> Derivación humana</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Respuesta final (sin derivación)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#475569"></div> Validaciones / Fallback</div>
+    <div class="legend-item" style="gap:4px">
+      <span class="tag pending">⚠️ PENDIENTE</span> Info que falta
+    </div>
+    <div class="legend-item" style="gap:4px">
+      <span class="tag human">🙋 HUMANO</span> Deriva a asesor
+    </div>
+    <div class="legend-item" style="gap:4px">
+      <span class="tag ok">✅ OK</span> Completamente implementado
+    </div>
+  </div>
+
+  <!-- ============================= -->
+  <!-- NODO 0: MENÚ PRINCIPAL -->
+  <!-- ============================= -->
+  <div class="section-title" id="nodo0">
+    🏠 Nodo 0 — Menú Principal (Entrada)
+  </div>
+
+  <div class="tree">
+    <div class="node root-node">
+      <div class="node-header open" onclick="toggleNode(this)">
+        <span class="node-id">NODO 0</span>
+        <span class="node-title">Mensaje inicial / Saludo</span>
+        <div class="node-tags">
+          <span class="tag ok">✅ Implementado</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body open">
+        <div class="node-section">
+          <div class="node-section-label">El usuario dispara este nodo cuando...</div>
+          <div class="trigger-list">
+            <span class="trigger-chip">"hola"</span>
+            <span class="trigger-chip">"buenas"</span>
+            <span class="trigger-chip">cualquier primer mensaje</span>
+            <span class="trigger-chip">sin sesión activa previa</span>
+          </div>
+        </div>
+        <div class="node-section">
+          <div class="bot-label">🤖 Rocky responde:</div>
+          <div class="bot-message">¡Buenas! Soy Rocky 🤘 el coordinador virtual de Travel Rock, Samba y Super Tour. ¡Bienvenido al canal oficial! Contame, ¿de qué promo es el pasajero?</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Opciones que el usuario puede elegir → lleva a:</div>
+          <div class="options-list">
+            <div class="option-item">
+              <div class="option-num">A</div>
+              <span>"promo 26" / "26" / "promoción 26"</span>
+              <span class="option-arrow">→ Menú Promo 26 (Nodo A1)</span>
+            </div>
+            <div class="option-item">
+              <div class="option-num">B</div>
+              <span>"promo 27" / "27" / "promoción 27"</span>
+              <span class="option-arrow">→ Menú Promo 27 (Nodo B1)</span>
+            </div>
+            <div class="option-item">
+              <div class="option-num">C</div>
+              <span>Pregunta general / FAQ (qué incluye, documentación, etc.)</span>
+              <span class="option-arrow">→ Rama FAQ (Nodo C)</span>
+            </div>
+            <div class="option-item">
+              <div class="option-num">❌</div>
+              <span>Texto libre no reconocido</span>
+              <span class="option-arrow">→ Fallback (Nodo V1)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- ============================= -->
+  <!-- RAMA A: PROMO 26 -->
+  <!-- ============================= -->
+  <div class="section-title" id="promo26">
+    <span class="section-label">RAMA A</span> Promo 26
+  </div>
+
+  <div class="tree">
+
+    <!-- NODO A1: Menú P26 -->
+    <div class="node promo26">
+      <div class="node-header open" onclick="toggleNode(this)">
+        <span class="node-id">A1</span>
+        <span class="node-title">Menú Promo 26</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body open">
+        <div class="node-section">
+          <div class="bot-label">🤖 Rocky responde:</div>
+          <div class="bot-message">¡Promo 26, vamos! 🚀🤘 ¿En qué te puedo ayudar? Elegí una opción:
+
+1. Quiero sumarme
+2. Cupón vencido
+3. Tasa y Seguro
+4. Fecha de viaje
+5. ¿Dónde pago?
+6. No tengo chequera
+7. Número de reserva/pasajero
+8. Resumen de cuenta</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Cada opción lleva a:</div>
+          <div class="options-list">
+            <div class="option-item"><div class="option-num">1</div><span>Quiero sumarme</span><span class="option-arrow">→ Nodo A1.1</span></div>
+            <div class="option-item"><div class="option-num">2</div><span>Cupón vencido</span><span class="option-arrow">→ Nodo A1.2 (pide DNI → humano)</span><span class="tag human option-tag">🙋 Humano</span></div>
+            <div class="option-item"><div class="option-num">3</div><span>Tasa y Seguro</span><span class="option-arrow">→ Nodo A1.3 (pide DNI → humano)</span><span class="tag human option-tag">🙋 Humano</span></div>
+            <div class="option-item"><div class="option-num">4</div><span>Fecha de viaje</span><span class="option-arrow">→ Nodo A1.4 (solo P26)</span></div>
+            <div class="option-item"><div class="option-num">5</div><span>¿Dónde pago?</span><span class="option-arrow">→ Nodo A1.5</span></div>
+            <div class="option-item"><div class="option-num">6</div><span>No tengo chequera</span><span class="option-arrow">→ Nodo A1.6 (humano directo)</span><span class="tag human option-tag">🙋 Humano</span></div>
+            <div class="option-item"><div class="option-num">7</div><span>Número de reserva/pasajero</span><span class="option-arrow">→ Nodo A1.7</span></div>
+            <div class="option-item"><div class="option-num">8</div><span>Resumen de cuenta</span><span class="option-arrow">→ Nodo A1.8 (pide DNI → humano)</span><span class="tag human option-tag">🙋 Humano</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.1 -->
+    <div class="node promo26" id="a11">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.1</span>
+        <span class="node-title">Quiero sumarme — Promo 26</span>
+        <div class="node-tags">
+          <span class="tag pending">⚠️ Formularios pendientes</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="bot-label">🤖 Rocky pregunta el destino:</div>
+          <div class="bot-message">¡Buenísimo que quieras sumarte! 🔥 ¿A qué destino va el grupo? (Bariloche / Camboriú)</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">→ Si elige BARILOCHE (Nodo A1.1.1)</div>
+          <div class="bot-label" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message">¡Bariloche es una locura! 🏔️🤘 Para Promo 26 por ahora se puede reservar el lugar nomás. El valor aproximado del tour es de $3.400.000 (recién en julio se puede abonar). Para asegurar el lugar seguí estos pasos:
+
+1️⃣ Abonás la inscripción de $200.000 por transferencia.
+2️⃣ Completás el formulario de inscripción con tus datos y el comprobante de pago: 📋 <span class="highlight-pending">[FORMULARIO_P26_BARILOCHE — PENDIENTE]</span>
+3️⃣ ¡Y listo, el lugar es tuyo!
+
+🏦 Datos bancarios:
+Entidad: Banco Industrial SA
+CVU: 0000069700000001036369
+Alias: lour.roso.dolarapp
+Titular: Maria Lourdes Rodríguez Sosa
+Cuenta: Cuenta Corriente
+
+¡Dale que arrancamos! 🚀
+
+📸 Y si todavía no nos seguís en Instagram, hacelo ya → https://www.instagram.com/travelrocksalta/</div>
+          <div class="scroll-hint">⚠️ Pendiente #1: Link del Google Form de inscripción Bariloche P26</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">→ Si elige CAMBORIÚ (Nodo A1.1.2)</div>
+          <div class="bot-label" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message">¡Camboriú es otro nivel! 🌴🔥 Todos los planes arrancan en marzo. Para reservar el lugar necesitás hacer una seña de $150.000 en concepto de inscripción.
+
+🏦 Datos bancarios:
+CBU: 1500017600006763499428
+Alias: TRAVELROCK.25
+Titular: Rodríguez Sosa, María Lourdes (DNI 35.044.027)
+Cuenta: Caja de Ahorro en Pesos (0676349942)
+
+📌 Una vez que transferís, completá el formulario de inscripción con tus datos y el comprobante: 📋 <span class="highlight-pending">[FORMULARIO_P26_CAMBORIU — PENDIENTE]</span>
+
+¡El lugar ya es tuyo! 💪
+
+📸 Seguinos en Instagram → https://www.instagram.com/travelrocksalta/</div>
+          <div class="scroll-hint">⚠️ Pendiente #2: Link del Google Form de inscripción Camboriú P26</div>
+        </div>
+        <div class="node-section">
+          <div class="action-block auto">✅ Estado final: Conversación continúa activa (bot responde). No requiere derivación humana en este punto.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.2 -->
+    <div class="node handoff" id="a12">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.2</span>
+        <span class="node-title">Cupón de Pago Vencido — Promo 26</span>
+        <div class="node-tags">
+          <span class="tag human">🙋 Deriva a humano</span>
+          <span class="tag ok">✅ OK</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="subflow">
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot bot"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role bot">Rocky pide DNI:</div>
+                <div class="bot-message">Copado, no hay drama. 👌 Para poder gestionarlo necesito identificar al pasajero. Pasame el número de DNI (solo números, sin puntos):</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot user"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role user">Usuario responde con DNI</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot validation"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role system">Sistema valida DNI (regex 7-8 dígitos)</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot bot"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role bot">Si DNI válido → Confirma y deriva:</div>
+                <div class="bot-message">✅ ¡Todo bien! Ya te paso con un asesor del equipo. Te responden por este mismo chat en breve. ¡Aguantá que ya viene! 🤘
+
+📸 Mientras esperás seguinos en Instagram → https://www.instagram.com/travelrocksalta/</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot human"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role human">Sistema: NEEDS_INTERVENTION = true → Bot se pausa → Asesor toma control</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Si el DNI ingresado es INVÁLIDO:</div>
+          <div class="bot-message" style="margin-top:8px">⚠️ Ese DNI no me cierra, parece que falta algo. Escribilo solo con números, sin puntos ni espacios (Ej: 40123456) y arrancamos.</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:12px;">El bot vuelve a esperar un DNI válido. Puede haber múltiples reintentos.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.3 -->
+    <div class="node handoff" id="a13">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.3</span>
+        <span class="node-title">Tasa y Seguro — Promo 26</span>
+        <div class="node-tags">
+          <span class="tag human">🙋 Deriva a humano</span>
+          <span class="tag ok">✅ OK</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div style="color:var(--muted); font-size:13px;">Flujo idéntico al Nodo A1.2 (Cupón Vencido). El bot pide el DNI del pasajero, valida el formato, confirma y deriva al asesor humano.</div>
+          <div class="bot-message" style="margin-top:10px">Copado, no hay drama. 👌 Para poder gestionarlo necesito identificar al pasajero. Pasame el número de DNI (solo números, sin puntos):</div>
+          <div class="action-block human" style="margin-top:10px">🙋 Al recibir DNI válido → NEEDS_INTERVENTION = true → Bot pausado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.4 -->
+    <div class="node leaf" id="a14">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.4</span>
+        <span class="node-title">Fecha de Viaje — Solo Promo 26</span>
+        <div class="node-tags">
+          <span class="tag warn">⚠️ Solo P26</span>
+          <span class="tag ok">✅ OK</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="bot-label">🤖 Rocky responde:</div>
+          <div class="bot-message">📅 Para la fecha exacta del viaje Promo 26 hablá directamente con nuestra Área Operativa:
+📞 Juan Ubiña: 387-251-9999 — ¡te va a dar todos los detalles!</div>
+        </div>
+        <div class="node-section">
+          <div class="action-block auto">✅ Respuesta final. Bot continúa activo. No hay fecha definida en el sistema aún.</div>
+          <div class="action-block warn" style="margin-top:8px">⚠️ Pendiente #7: Cuando haya fecha definida, actualizar el prompt para que el bot la informe directamente.</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Nota: Este nodo NO existe en Promo 27</div>
+          <div style="color:var(--muted); font-size:13px;">Si un usuario de Promo 27 pregunta por la fecha de viaje, caerá en fallback o derivación humana. Ver Pendiente #8.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.5 -->
+    <div class="node leaf" id="a15">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.5</span>
+        <span class="node-title">¿Dónde pago? — Medios de Pago</span>
+        <div class="node-tags">
+          <span class="tag pending">⚠️ Video pendiente</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="bot-label">🤖 Rocky responde:</div>
+          <div class="bot-message">Tenés un montón de opciones, re fácil 💳:
+
+🔹 Presencial:
+• Pago Fácil
+• Sucursal Salta: Ameghino 234 (L a V de 10:00 a 12:30 y 14:00 a 18:00 hs)
+
+🔹 Online / Billeteras digitales:
+• Mercado Pago o Naranja X
+• Billetera Travel Rock (¡La opción más fácil!)
+
+¿Cómo usar nuestra App de pagos? 📲
+📹 <span class="highlight-pending">[VIDEO TUTORIAL — PENDIENTE]</span>
+
+1. Descargá la app 'Travel Go' o entrá por la versión web:
+   🌐 https://travelrock.daxiaplatform.com/
+2. Ingresá con DNI (usuario) y Número de Pasajero (clave).
+3. Vas a ver tu próxima cuota, vencimiento, saldo y tu Alias/CBU asignado.
+4. Copiá tu Alias y transferí el dinero desde tu banco. ¡El pago es automático si hay saldo suficiente!
+
+📱 Descargá la app:
+• Android → https://play.google.com/store/apps/details?id=com.globant.travelrock.collect
+• iOS → https://apps.apple.com/ar/app/travel-go/id6746509841</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Nota: Promo 26 incluye la opción presencial en Sucursal Salta. Promo 27 omite esa línea (según el material original).</div>
+          <div class="action-block auto" style="margin-top:8px">✅ Bot continúa activo. No hay derivación humana.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.6 -->
+    <div class="node handoff" id="a16">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.6</span>
+        <span class="node-title">No tengo chequera — Solo Promo 26</span>
+        <div class="node-tags">
+          <span class="tag human">🙋 Humano directo</span>
+          <span class="tag ok">✅ OK</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="bot-label">🤖 Rocky responde (sin pedir DNI):</div>
+          <div class="bot-message">No te preocupes. 👩‍💻 Para poder solucionarlo, te voy a contactar con un asesor operativo. Aguardá un momento en línea por favor...
+
+📸 Seguinos en Instagram → https://www.instagram.com/travelrocksalta/</div>
+          <div class="action-block human" style="margin-top:10px">🙋 Derivación humana INMEDIATA — No pide DNI. NEEDS_INTERVENTION = true → Bot pausado.</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Nota: Este nodo NO existe en el menú de Promo 27</div>
+          <div style="color:var(--muted); font-size:13px;">Si un usuario de Promo 27 dice "no tengo chequera" de forma libre, el bot lo detectará y derivará igualmente (el prompt lo cubre aunque no esté en el menú explícito).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.7 -->
+    <div class="node leaf" id="a17">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.7</span>
+        <span class="node-title">Número de Reserva / Pasajero</span>
+        <div class="node-tags">
+          <span class="tag pending">⚠️ Imagen pendiente</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="bot-label">🤖 Rocky responde:</div>
+          <div class="bot-message">Los dos números están impresos en los cupones de tu chequera de pago. 🎫 ¡Fijate ahí!
+
+🖼️ <span class="highlight-pending">[IMAGEN DEL CUPÓN — PENDIENTE]</span>
+(Imagen que muestra dónde están el Nro de Reserva y Nro de Pasajero en el cupón genérico)</div>
+          <div class="action-block auto" style="margin-top:10px">✅ Bot continúa activo. No hay derivación humana.</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Este nodo existe igual en Promo 27 (Nodo B1.5) con el mismo comportamiento</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO A1.8 -->
+    <div class="node handoff" id="a18">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">A1.8</span>
+        <span class="node-title">Resumen de Cuenta — Promo 26</span>
+        <div class="node-tags">
+          <span class="tag human">🙋 Deriva a humano</span>
+          <span class="tag ok">✅ OK</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div style="color:var(--muted); font-size:13px;">Flujo idéntico al Nodo A1.2. El bot pide el DNI del pasajero, valida el formato y deriva al asesor humano para que revise la cuenta.</div>
+          <div class="bot-message" style="margin-top:10px">Por supuesto. Para buscar tus pagos, 📄 por favor, indicame el número de DNI del pasajero (solo números, sin puntos):</div>
+          <div class="bot-message" style="margin-top:8px">✅ ¡Todo bien! Ya te paso con un asesor del equipo. Te responden por este mismo chat en breve. ¡Aguantá que ya viene! 🤘</div>
+          <div class="action-block human" style="margin-top:10px">🙋 NEEDS_INTERVENTION = true → Bot pausado</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tree promo26 -->
+
+  <hr />
+
+  <!-- ============================= -->
+  <!-- RAMA B: PROMO 27 -->
+  <!-- ============================= -->
+  <div class="section-title" id="promo27">
+    <span class="section-label b">RAMA B</span> Promo 27
+  </div>
+
+  <div class="tree">
+
+    <!-- NODO B1 -->
+    <div class="node promo27">
+      <div class="node-header open" onclick="toggleNode(this)">
+        <span class="node-id">B1</span>
+        <span class="node-title">Menú Promo 27</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body open">
+        <div class="node-section">
+          <div class="bot-label teal">🤖 Rocky responde:</div>
+          <div class="bot-message teal">¡Promo 27, vamos! 🤘🔥 ¿En qué te puedo ayudar? Elegí una opción:
+
+1. Quiero sumarme
+2. Cupón vencido
+3. Tasa y Seguro
+4. ¿Dónde pago?
+5. Nro Reserva/Pasajero
+6. Resumen de cuenta</div>
+          <div style="margin-top:10px; color:var(--muted); font-size:13px;">⚠️ Diferencia con P26: NO incluye "No tengo chequera" ni "Fecha de viaje" en el menú visible.</div>
+        </div>
+        <div class="node-section">
+          <div class="options-list">
+            <div class="option-item"><div class="option-num">1</div><span>Quiero sumarme</span><span class="option-arrow">→ Nodo B1.1</span></div>
+            <div class="option-item"><div class="option-num">2</div><span>Cupón vencido</span><span class="option-arrow">→ Nodo B1.2 (pide DNI → humano)</span><span class="tag human option-tag">🙋 Humano</span></div>
+            <div class="option-item"><div class="option-num">3</div><span>Tasa y Seguro</span><span class="option-arrow">→ Nodo B1.3 (pide DNI → humano)</span><span class="tag human option-tag">🙋 Humano</span></div>
+            <div class="option-item"><div class="option-num">4</div><span>¿Dónde pago?</span><span class="option-arrow">→ Nodo B1.4</span></div>
+            <div class="option-item"><div class="option-num">5</div><span>Nro Reserva/Pasajero</span><span class="option-arrow">→ Nodo B1.5</span></div>
+            <div class="option-item"><div class="option-num">6</div><span>Resumen de cuenta</span><span class="option-arrow">→ Nodo B1.6 (pide DNI → humano)</span><span class="tag human option-tag">🙋 Humano</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO B1.1 -->
+    <div class="node promo27" id="b11">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">B1.1</span>
+        <span class="node-title">Quiero sumarme — Promo 27</span>
+        <div class="node-tags">
+          <span class="tag pending">⚠️ Formularios pendientes</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="bot-label teal">🤖 Rocky pregunta el destino:</div>
+          <div class="bot-message teal">¡Bienvenidos a la Promo 27! 🎉 ¿A qué destino viaja el grupo? (Bariloche / Camboriú)</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">→ Si elige BARILOCHE (Nodo B1.1.1)</div>
+          <div class="bot-label teal" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message teal">¡Bariloche con Promo 27, re bien! 🏔️🤘 Estos son los planes disponibles:
+
+📌 Plan Máx (17 cuotas): $182.589/mes
+📌 Plan 10 cuotas: $239.000/mes
+📌 Plan 3 cuotas: $676.667/mes
+
+La inscripción es de $200.000 para reservar el lugar.
+
+🏦 Datos bancarios:
+CBU: 1500017600006763499428
+Alias: TRAVELROCK.25
+Titular: Rodríguez Sosa, María Lourdes (DNI 35.044.027)
+Cuenta: Caja de Ahorro en Pesos
+
+📋 Una vez que elegís el plan y transferís, completá el formulario con tus datos y el comprobante: <span class="highlight-pending">[FORMULARIO_P27_BARILOCHE — PENDIENTE]</span>
+
+¡Dale que te sumás! 🚀
+
+📸 Seguinos → https://www.instagram.com/travelrocksalta/</div>
+          <div class="scroll-hint">⚠️ Pendiente #3: Link del Google Form de inscripción Bariloche P27</div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">→ Si elige CAMBORIÚ (Nodo B1.1.2)</div>
+          <div class="bot-label teal" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message teal">¡Camboriú Promo 27, una locura! 🌴🔥 Estos son los planes:
+
+📌 Plan A (19 cuotas): $123.780/mes
+📌 Plan B (10 cuotas): $212.800/mes
+📌 Plan C (3 cuotas): $673.000/mes
+📌 Plan D (1 pago): $2.000.000
+
+La inscripción es de $150.000.
+
+🏦 Datos bancarios:
+CBU: 1500017600006763499428
+Alias: TRAVELROCK.25
+Titular: Rodríguez Sosa, María Lourdes (DNI 35.044.027)
+Cuenta: Caja de Ahorro en Pesos
+
+📋 Elegís el plan, transferís y completás el formulario con tus datos y el comprobante: <span class="highlight-pending">[FORMULARIO_P27_CAMBORIU — PENDIENTE]</span>
+
+¡El lugar es tuyo! 💪
+
+📸 Seguinos → https://www.instagram.com/travelrocksalta/</div>
+          <div class="scroll-hint">⚠️ Pendiente #4: Link del Google Form de inscripción Camboriú P27</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO B1.2 -->
+    <div class="node handoff" id="b12">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">B1.2</span>
+        <span class="node-title">Cupón Vencido — Promo 27</span>
+        <div class="node-tags"><span class="tag human">🙋 Deriva a humano</span><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div style="color:var(--muted); font-size:13px;">Flujo idéntico al Nodo A1.2. Pide DNI → valida → deriva a humano.</div>
+          <div class="action-block human" style="margin-top:8px">🙋 NEEDS_INTERVENTION = true → Bot pausado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO B1.3 -->
+    <div class="node handoff" id="b13">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">B1.3</span>
+        <span class="node-title">Tasa y Seguro — Promo 27</span>
+        <div class="node-tags"><span class="tag human">🙋 Deriva a humano</span><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div style="color:var(--muted); font-size:13px;">Flujo idéntico al Nodo A1.3. Pide DNI → valida → deriva a humano.</div>
+          <div class="action-block human" style="margin-top:8px">🙋 NEEDS_INTERVENTION = true → Bot pausado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO B1.4 -->
+    <div class="node leaf" id="b14">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">B1.4</span>
+        <span class="node-title">¿Dónde pago? — Promo 27</span>
+        <div class="node-tags">
+          <span class="tag pending">⚠️ Video pendiente</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="bot-label teal">🤖 Rocky responde (similar a A1.5 pero sin sucursal presencial):</div>
+          <div class="bot-message teal">Podés abonar a través de las siguientes opciones 💳:
+• Pago Fácil, Mercado Pago o Naranja X
+• Billetera Travel Rock (la más fácil)
+
+¿Cómo usar la App / Web? 📲
+📹 <span class="highlight-pending">[VIDEO TUTORIAL — PENDIENTE]</span>
+
+Descargá 'Travel Go':
+• Android → https://play.google.com/store/apps/details?id=com.globant.travelrock.collect
+• iOS → https://apps.apple.com/ar/app/travel-go/id6746509841
+• Web → https://travelrock.daxiaplatform.com/</div>
+          <div style="margin-top:8px; color:var(--muted); font-size:12px;">Diferencia con P26: NO menciona la sucursal presencial de Ameghino 234.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO B1.5 -->
+    <div class="node leaf" id="b15">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">B1.5</span>
+        <span class="node-title">Nro Reserva/Pasajero — Promo 27</span>
+        <div class="node-tags">
+          <span class="tag pending">⚠️ Imagen pendiente</span>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div style="color:var(--muted); font-size:13px;">Comportamiento idéntico al Nodo A1.7. Indica que los números están en los cupones de la chequera y envía imagen de referencia.</div>
+          <div class="action-block auto" style="margin-top:8px">✅ Bot continúa activo.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO B1.6 -->
+    <div class="node handoff" id="b16">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">B1.6</span>
+        <span class="node-title">Resumen de Cuenta — Promo 27</span>
+        <div class="node-tags"><span class="tag human">🙋 Deriva a humano</span><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div style="color:var(--muted); font-size:13px;">Flujo idéntico al Nodo A1.8. Pide DNI → valida → deriva a humano para que el asesor revise la cuenta.</div>
+          <div class="action-block human" style="margin-top:8px">🙋 NEEDS_INTERVENTION = true → Bot pausado</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tree promo27 -->
+
+  <hr />
+
+  <!-- ============================= -->
+  <!-- RAMA C: FAQ -->
+  <!-- ============================= -->
+  <div class="section-title" id="faq">
+    <span class="section-label c">RAMA C</span> Preguntas Frecuentes (FAQ)
+  </div>
+
+  <div class="tree">
+
+    <div class="node faq">
+      <div class="node-header open" onclick="toggleNode(this)">
+        <span class="node-id">C1</span>
+        <span class="node-title">¿Qué incluye el viaje? / ¿Cuántos días son?</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body open">
+        <div class="node-section">
+          <div class="trigger-list">
+            <span class="trigger-chip">"qué incluye"</span>
+            <span class="trigger-chip">"cuántos días"</span>
+            <span class="trigger-chip">"cuántas noches"</span>
+            <span class="trigger-chip">"qué tiene el paquete"</span>
+          </div>
+          <div class="bot-label purple" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message purple">¡Son 11 días y 8 noches de pura aventura! 🔥 (puede variar un poco según el punto de partida). ¡Una semana y pico que no vas a olvidar jamás!
+
+📸 En el Instagram vas a ver fotos y videos de viajes anteriores → https://www.instagram.com/travelrocksalta/</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node faq">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">C2</span>
+        <span class="node-title">¿Cómo es el transporte?</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="trigger-list">
+            <span class="trigger-chip">"transporte"</span>
+            <span class="trigger-chip">"micro"</span>
+            <span class="trigger-chip">"colectivo"</span>
+            <span class="trigger-chip">"bus"</span>
+            <span class="trigger-chip">"cómo viajamos"</span>
+          </div>
+          <div class="bot-label purple" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message purple">Nada de micro viejo, te lo juro 😅 Unidades con menos de 2 años de antigüedad, servicio semi-cama 5 estrellas. ¡Como si fuera un vuelo en tierra!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node faq">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">C3</span>
+        <span class="node-title">¿Cuántos coordinadores van?</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="trigger-list">
+            <span class="trigger-chip">"coordinadores"</span>
+            <span class="trigger-chip">"van solos"</span>
+            <span class="trigger-chip">"quién los acompaña"</span>
+            <span class="trigger-chip">"hay adultos"</span>
+          </div>
+          <div class="bot-label purple" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message purple">¡No están solos nunca! 💪 Van 2 coordinadores acompañando al grupo las 24hs más todo el equipo estable en destino (Bariloche o Camboriú). ¡Una familia entera!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node faq">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">C4</span>
+        <span class="node-title">¿Qué documentación necesitan?</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="trigger-list">
+            <span class="trigger-chip">"documentos"</span>
+            <span class="trigger-chip">"documentación"</span>
+            <span class="trigger-chip">"qué necesitan"</span>
+            <span class="trigger-chip">"qué hay que llevar"</span>
+          </div>
+          <div class="bot-label purple" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message purple">Para el viaje vas a necesitar:
+📄 DNI
+📋 Chequera de pago
+🏥 Ficha Médica Personal rubricada
+
+¡Tres cositas y listo el pollo!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node faq">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">C5</span>
+        <span class="node-title">Excursiones disponibles en Bariloche</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="trigger-list">
+            <span class="trigger-chip">"excursiones"</span>
+            <span class="trigger-chip">"actividades"</span>
+            <span class="trigger-chip">"qué hacen"</span>
+            <span class="trigger-chip">"ski"</span>
+            <span class="trigger-chip">"nieve"</span>
+          </div>
+          <div class="bot-label purple" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message purple">¡Las excursiones son lo más! 🎿❄️ Tenemos dos paquetes principales:
+
+🔹 Ski & Snowboard — Para los que quieren ponerse los esquíes y bajar la montaña
+🔹 Nieve & Sol — Para los que prefieren disfrutar la nieve sin entrar a la pista
+
+Para ver todos los detalles y precios → https://travelrock.com.ar/
+
+📸 En el Instagram subimos fotos de cada excursión → https://www.instagram.com/travelrocksalta/</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node faq">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">C6</span>
+        <span class="node-title">Boliches / Discos en Bariloche</span>
+        <div class="node-tags"><span class="tag ok">✅ OK</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="trigger-list">
+            <span class="trigger-chip">"boliches"</span>
+            <span class="trigger-chip">"discos"</span>
+            <span class="trigger-chip">"salir de noche"</span>
+            <span class="trigger-chip">"dónde bailan"</span>
+          </div>
+          <div class="bot-label purple" style="margin-top:10px">🤖 Rocky responde:</div>
+          <div class="bot-message purple">¡Esto es lo que los pibes esperan! 🎉🔥 Las opciones de discos en Bariloche:
+
+🎵 GRISÚ → http://www.grisubariloche.com/
+🎵 GENUX → http://www.genux.com.ar/
+🎵 ROKET → http://www.roket.com/
+🎵 CEREBRO → http://www.cerebro.com.ar/
+🎵 BY PASS → http://www.bypass.com.ar/
+🎵 SKI RANCH → https://www.facebook.com/skiranch/
+
+¡Six opciones para que la noche no pare nunca! 🤘</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tree faq -->
+
+  <hr />
+
+  <!-- ============================= -->
+  <!-- VALIDACIONES Y FALLBACKS -->
+  <!-- ============================= -->
+  <div class="section-title" id="validaciones">
+    <span class="section-label v">SISTEMA</span> Validaciones, Fallbacks y Derivación Humana
+  </div>
+
+  <div class="tree">
+
+    <!-- DNI Validation -->
+    <div class="node validation">
+      <div class="node-header open" onclick="toggleNode(this)">
+        <span class="node-id">V1</span>
+        <span class="node-title">Validación de DNI</span>
+        <div class="node-tags"><span class="tag ok">✅ Implementado</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body open">
+        <div class="node-section">
+          <div class="node-section-label">Regla de validación</div>
+          <div class="data-block">
+            <span class="data-key">Regex:</span> <span class="data-val">^\d{7,8}$</span><br/>
+            <span class="data-key">Condición:</span> <span class="data-val">Solo números, 7 u 8 dígitos, sin puntos ni espacios</span><br/>
+            <span class="data-key">Ejemplos válidos:</span> <span class="data-val">40123456 / 8123456</span><br/>
+            <span class="data-key">Ejemplos inválidos:</span> <span class="data-val">40.123.456 / 401234 / abc</span>
+          </div>
+        </div>
+        <div class="node-section">
+          <div class="subflow">
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot user"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role user">Usuario envía DNI</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot validation"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role system">Sistema evalúa: ¿coincide con regex?</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot bot"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role bot">Si NO válido → Mensaje de error:</div>
+                <div class="bot-message">⚠️ Ese DNI no me cierra, parece que falta algo. Escribilo solo con números, sin puntos ni espacios (Ej: 40123456) y arrancamos.</div>
+                <div style="margin-top:4px; color:var(--muted); font-size:12px;">→ Vuelve a esperar DNI. Sin límite de reintentos.</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot bot"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role bot">Si VÁLIDO → Confirma y deriva:</div>
+                <div class="bot-message">✅ ¡Todo bien! Ya te paso con un asesor del equipo. Te responden por este mismo chat en breve. ¡Aguantá que ya viene! 🤘</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot human"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role human">NEEDS_INTERVENTION = true → Bot se pausa → Asesor notificado en CRM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fallback -->
+    <div class="node validation">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">V2</span>
+        <span class="node-title">Fallback — Intención no detectada</span>
+        <div class="node-tags"><span class="tag ok">✅ Implementado</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="node-section-label">Cuándo se activa</div>
+          <div style="color:var(--muted); font-size:13px; margin-bottom:10px;">Cuando el usuario escribe texto libre que no coincide con ningún nodo del flujo y no hay estado de sesión activo que defina el contexto.</div>
+          <div class="subflow">
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot bot"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role bot">Primer intento fallido:</div>
+                <div class="bot-message">¿De qué promoción es el pasajero? Por favor, respondé con 'Promo 26' o 'Promo 27'.</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot bot"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role bot">Segundo intento fallido:</div>
+                <div class="bot-message">Perdón, no logré entenderte 😅. Para ayudarte más rápido, por favor elegí una opción escribiendo:
+1️⃣ Promo 26
+2️⃣ Promo 27
+3️⃣ Hablar con un asesor</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot human"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role human">Si elige "3. Hablar con un asesor" → NEEDS_INTERVENTION = true</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Handoff general -->
+    <div class="node handoff">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">V3</span>
+        <span class="node-title">Derivación Humana — Comportamiento del sistema</span>
+        <div class="node-tags"><span class="tag human">🙋 Proceso interno</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="node-section-label">5 situaciones que generan NEEDS_INTERVENTION = true</div>
+          <div class="options-list">
+            <div class="option-item"><div class="option-num">1</div><span>DNI válido recibido en contexto de cupón vencido / tasa / resumen</span></div>
+            <div class="option-item"><div class="option-num">2</div><span>"No tengo chequera" (Promo 26 y libre en ambas)</span></div>
+            <div class="option-item"><div class="option-num">3</div><span>Usuario pide explícitamente hablar con un humano</span></div>
+            <div class="option-item"><div class="option-num">4</div><span>Segundo fallback consecutivo sin detección de intención</span></div>
+            <div class="option-item"><div class="option-num">5</div><span>Cualquier consulta que Rocky no puede resolver con información disponible</span></div>
+          </div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Qué ocurre en el sistema cuando NEEDS_INTERVENTION = true</div>
+          <div class="subflow">
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot bot"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role bot">Rocky envía mensaje de cierre al usuario</div>
+                <div class="bot-message yellow">✅ ¡Todo bien! Ya te paso con un asesor del equipo. Te responden por este mismo chat en breve. ¡Aguantá que ya viene! 🤘</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot validation"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role system">Backend detecta el bloque JSON en la respuesta de Claude:</div>
+                <div class="data-block" style="margin-top:6px;">{<br/>&nbsp;&nbsp;<span class="data-key">"NEEDS_INTERVENTION"</span>: <span class="data-val">true</span><br/>}</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot validation"></div><div class="subflow-line"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role system">PostgreSQL: status → "paused", needs_intervention → true</div>
+              </div>
+            </div>
+            <div class="subflow-step">
+              <div class="subflow-connector"><div class="subflow-dot human"></div></div>
+              <div class="subflow-content">
+                <div class="subflow-role human">CRM React muestra ⚠️ en la conversación. IA deja de responder. Asesor toma control manualmente.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="node-section">
+          <div class="node-section-label">Cómo se reactiva el bot</div>
+          <div class="options-list">
+            <div class="option-item">
+              <div class="option-num">▶</div>
+              <span>El asesor hace click en "Reanudar Bot" en el CRM → status vuelve a "active" → Rocky retoma respuestas automáticas</span>
+            </div>
+            <div class="option-item">
+              <div class="option-num">✓</div>
+              <span>El asesor hace click en "Atendido" → limpia el flag ⚠️ de NEEDS_INTERVENTION</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instagram -->
+    <div class="node faq">
+      <div class="node-header" onclick="toggleNode(this)">
+        <span class="node-id">V4</span>
+        <span class="node-title">Instagram — Promoción contextual</span>
+        <div class="node-tags"><span class="tag ok">✅ Implementado</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="node-body">
+        <div class="node-section">
+          <div class="node-section-label">Rocky menciona el Instagram en estos momentos (no en todos los mensajes)</div>
+          <div class="options-list">
+            <div class="option-item"><div class="option-num">→</div><span>Cuando el usuario confirma que se suma o muestra interés en sumarse</span></div>
+            <div class="option-item"><div class="option-num">→</div><span>Cuando responde sobre qué incluye el viaje, excursiones o boliches</span></div>
+            <div class="option-item"><div class="option-num">→</div><span>Al derivar a un asesor humano (como cierre)</span></div>
+          </div>
+          <div class="bot-message purple" style="margin-top:10px">Y si todavía no nos seguís en Instagram, hacelo ya 📸👉 https://www.instagram.com/travelrocksalta/ — ahí subimos todo: fotos de viajes anteriores, novedades, sorteos... ¡no te lo pierdas!</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tree validaciones -->
+
+  <hr />
+
+  <!-- ============================= -->
+  <!-- RESUMEN DATOS BANCARIOS -->
+  <!-- ============================= -->
+  <div class="section-title">
+    <span class="section-label v">REFERENCIA</span> Datos Bancarios y Contactos
+  </div>
+
+  <div class="node validation" style="margin-bottom:12px;">
+    <div class="node-header open" onclick="toggleNode(this)">
+      <span class="node-id">REF</span>
+      <span class="node-title">Datos bancarios por promo/destino</span>
+      <div class="node-tags"><span class="tag ok">✅ Completos</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="node-body open">
+      <div class="node-section">
+        <div class="node-section-label">Promo 26 — Bariloche (Banco Industrial)</div>
+        <div class="data-block">
+          <span class="data-key">Entidad:</span>   <span class="data-val">Banco Industrial SA</span><br/>
+          <span class="data-key">CVU:</span>        <span class="data-val">0000069700000001036369</span><br/>
+          <span class="data-key">Alias:</span>      <span class="data-val">lour.roso.dolarapp</span><br/>
+          <span class="data-key">Titular:</span>    <span class="data-val">Maria Lourdes Rodríguez Sosa</span><br/>
+          <span class="data-key">Tipo:</span>       <span class="data-val">Cuenta Corriente</span><br/>
+          <span class="data-key">Monto:</span>      <span class="data-val">$200.000 inscripción / $3.400.000 total aprox (abona en julio)</span>
+        </div>
+      </div>
+      <div class="node-section">
+        <div class="node-section-label">Promo 26 Camboriú / Promo 27 Bariloche / Promo 27 Camboriú (mismo CBU)</div>
+        <div class="data-block">
+          <span class="data-key">CBU:</span>        <span class="data-val">1500017600006763499428</span><br/>
+          <span class="data-key">Alias:</span>      <span class="data-val">TRAVELROCK.25</span><br/>
+          <span class="data-key">Titular:</span>    <span class="data-val">Rodríguez Sosa, María Lourdes (DNI 35.044.027)</span><br/>
+          <span class="data-key">Tipo:</span>       <span class="data-val">Caja de Ahorro en Pesos (0676349942)</span><br/>
+          <span class="data-key">P26 Camboriú:</span> <span class="data-val">$150.000 inscripción</span><br/>
+          <span class="data-key">P27 Bariloche:</span> <span class="data-val">$200.000 inscripción + plan cuotas</span><br/>
+          <span class="data-key">P27 Camboriú:</span> <span class="data-val">$150.000 inscripción + plan cuotas</span>
+        </div>
+      </div>
+      <div class="node-section">
+        <div class="node-section-label">Contacto Operativo</div>
+        <div class="data-block">
+          <span class="data-key">Nombre:</span>    <span class="data-val">Juan Ubiña</span><br/>
+          <span class="data-key">Teléfono:</span>  <span class="data-val">387-251-9999</span><br/>
+          <span class="data-key">Motivo:</span>    <span class="data-val">Fechas de viaje Promo 26 (único caso donde el bot deriva a teléfono directo)</span>
+        </div>
+      </div>
+      <div class="node-section">
+        <div class="node-section-label">App Travel Go</div>
+        <div class="data-block">
+          <span class="data-key">Android:</span>   <span class="data-val">https://play.google.com/store/apps/details?id=com.globant.travelrock.collect</span><br/>
+          <span class="data-key">iOS:</span>        <span class="data-val">https://apps.apple.com/ar/app/travel-go/id6746509841</span><br/>
+          <span class="data-key">Web:</span>        <span class="data-val">https://travelrock.daxiaplatform.com/</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= -->
+  <!-- FOOTER -->
+  <!-- ============================= -->
+  <div style="text-align:center; padding:40px 0 20px; color:var(--muted); font-size:12px; border-top:1px solid var(--border); margin-top:32px;">
+    <strong>TravelRock Bot — Informe de Flujos Conversacionales</strong><br/>
+    Generado: Marzo 2026 · Bot: Rocky 🤘 · Modelo: Claude Sonnet · Plataforma: WhatsApp Business Cloud API<br/>
+    <span style="color:var(--tag-pending); margin-top:6px; display:block;">9 puntos pendientes identificados — ver panel al inicio del documento</span>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  function toggleNode(header) {
+    header.classList.toggle('open');
+    const body = header.nextElementSibling;
+    if (body && body.classList.contains('node-body')) {
+      body.classList.toggle('open');
+    }
+  }
+
+  // Smooth scroll for TOC links
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

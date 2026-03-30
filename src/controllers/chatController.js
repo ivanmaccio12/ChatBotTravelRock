@@ -1,5 +1,6 @@
 import { processIncomingMessage } from '../services/aiService.js';
 import axios from 'axios';
+import { unpauseSession } from '../services/conversationService.js';
 
 export const chatController = async (req, res) => {
     try {
@@ -27,5 +28,24 @@ export const chatController = async (req, res) => {
     } catch (error) {
         console.error('Error en chatController:', error);
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
+};
+
+export const unpauseController = async (req, res) => {
+    try {
+        const { session_id } = req.body;
+        if (!session_id) {
+            return res.status(400).json({ error: 'session_id is required' });
+        }
+        
+        const success = await unpauseSession(session_id);
+        if (success) {
+            res.json({ success: true, message: 'Conversación reanudada' });
+        } else {
+            res.status(500).json({ error: 'Failed to update session status' });
+        }
+    } catch (error) {
+        console.error('Error in unpauseController:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };

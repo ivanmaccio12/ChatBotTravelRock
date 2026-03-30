@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Rocky — TravelRock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0b141a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+    }
+
+    /* ── Wallpaper de fondo tipo WhatsApp ── */
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background-color: #0b141a;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .chat-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 430px;
+      height: 100dvh;
+      max-height: 820px;
+      display: flex;
+      flex-direction: column;
+      background: #111b21;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    }
+
+    /* ── Status bar falsa ── */
+    .status-bar {
+      background: #1f2c34;
+      padding: 6px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .status-bar span { color: #e9edef; font-size: 11px; font-weight: 600; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .status-icons svg { width: 14px; height: 14px; fill: #e9edef; opacity: 0.8; }
+
+    /* ── Header ── */
+    .chat-header {
+      background: #1f2c34;
+      padding: 10px 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .back-btn {
+      color: #00a884;
+      font-size: 22px;
+      line-height: 1;
+      cursor: default;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #e63946 0%, #c1121f 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .hinfo { flex: 1; }
+    .hinfo h3 { color: #e9edef; font-size: 0.97rem; font-weight: 600; }
+    .hinfo p  { color: #00a884; font-size: 0.72rem; margin-top: 1px; }
+
+    .header-icons { display: flex; gap: 18px; align-items: center; }
+    .header-icons svg { width: 20px; height: 20px; fill: #8696a0; cursor: default; }
+
+    /* ── Date chip ── */
+    .date-chip {
+      align-self: center;
+      background: #1f2c34;
+      color: #8696a0;
+      font-size: 0.72rem;
+      padding: 4px 14px;
+      border-radius: 100px;
+      margin: 8px 0 4px;
+    }
+
+    /* ── Messages ── */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: #0b141a;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      scroll-behavior: smooth;
+    }
+
+    .messages::-webkit-scrollbar { width: 3px; }
+    .messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+
+    .msg {
+      max-width: 80%;
+      padding: 7px 12px 5px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      word-break: break-word;
+      position: relative;
+      animation: fadeUp 0.18s ease;
+      margin: 1px 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.bot {
+      background: #1f2c34;
+      color: #e9edef;
+      align-self: flex-start;
+      border-top-left-radius: 3px;
+    }
+    /* Tail izquierda */
+    .msg.bot::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 0;
+      border-width: 0 8px 8px 0;
+      border-style: solid;
+      border-color: transparent #1f2c34 transparent transparent;
+    }
+
+    .msg.user {
+      background: #005c4b;
+      color: #e9edef;
+      align-self: flex-end;
+      border-top-right-radius: 3px;
+    }
+    /* Tail derecha */
+    .msg.user::before {
+      content: '';
+      position: absolute;
+      right: -7px;
+      top: 0;
+      border-width: 0 0 8px 8px;
+      border-style: solid;
+      border-color: transparent transparent transparent #005c4b;
+    }
+
+    .msg .ts {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.35);
+      display: block;
+      text-align: right;
+      margin-top: 3px;
+    }
+    .msg.user .ts { color: rgba(255,255,255,0.45); }
+
+    /* ── Typing indicator ── */
+    .typing {
+      align-self: flex-start;
+      background: #1f2c34;
+      border-radius: 10px;
+      border-top-left-radius: 3px;
+      padding: 11px 15px;
+      display: none;
+      animation: fadeUp 0.18s ease;
+      margin: 1px 0;
+    }
+    .typing.show { display: flex; gap: 5px; align-items: center; }
+    .dot {
+      width: 7px; height: 7px;
+      background: #8696a0;
+      border-radius: 50%;
+      animation: bounce 1.3s ease infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.18s; }
+    .dot:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30%            { transform: translateY(-5px); }
+    }
+
+    /* ── Paused notice ── */
+    .paused-notice {
+      background: rgba(255,209,102,0.12);
+      border: 1px solid rgba(255,209,102,0.25);
+      color: #ffd166;
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 8px 14px;
+      flex-shrink: 0;
+      display: none;
+    }
+    .paused-notice.show { display: block; }
+
+    /* ── Input row ── */
+    .input-row {
+      background: #1f2c34;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .emoji-btn {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      color: #8696a0; font-size: 1.3rem; cursor: default; flex-shrink: 0;
+    }
+
+    .input-row input {
+      flex: 1;
+      background: #2a3942;
+      border: none;
+      border-radius: 24px;
+      padding: 9px 16px;
+      color: #e9edef;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: background 0.2s;
+    }
+    .input-row input:focus { background: #2e434f; }
+    .input-row input::placeholder { color: #8696a0; }
+    .input-row input:disabled { opacity: 0.5; }
+
+    .send-btn {
+      width: 44px; height: 44px;
+      background: #00a884;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+    .send-btn:hover  { background: #008f70; }
+    .send-btn:active { transform: scale(0.93); }
+    .send-btn:disabled { opacity: 0.45; cursor: default; }
+    .send-btn svg { width: 20px; height: 20px; fill: white; margin-left: 2px; }
+
+    /* ── Test badge ── */
+    .test-badge {
+      position: absolute;
+      top: 72px;
+      right: 12px;
+      background: rgba(230,57,70,0.85);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 100px;
+      letter-spacing: 0.5px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    @media (min-width: 500px) {
+      body { padding: 20px; }
+    }
+    @media (max-width: 430px) {
+      .chat-wrap { border-radius: 0; max-height: 100dvh; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+
+<div class="chat-wrap">
+
+  <!-- Status bar falsa -->
+  <div class="status-bar">
+    <span id="clock">12:00</span>
+    <div class="status-icons">
+      <!-- Signal -->
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <!-- Wifi -->
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <!-- Battery -->
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="back-btn">‹</div>
+    <div class="avatar">🤘</div>
+    <div class="hinfo">
+      <h3>Rocky — TravelRock</h3>
+      <p id="status-text">● En línea — Coordinador Virtual</p>
+    </div>
+    <div class="header-icons">
+      <!-- Video call icon -->
+      <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+      <!-- Phone icon -->
+      <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      <!-- Dots menu -->
+      <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    </div>
+  </div>
+
+  <!-- Badge de prueba -->
+  <div class="test-badge">MODO DEMO</div>
+
+  <!-- Messages -->
+  <div class="messages" id="msgs">
+    <div class="date-chip" id="dateChip">Hoy</div>
+    <div class="typing" id="typing">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- Aviso de bot pausado -->
+  <div class="paused-notice" id="pausedNotice">
+    🙋 Un asesor tomará el control de la conversación en breve.
+    <br>
+    <button id="restartBtn" style="margin-top: 10px; padding: 8px 16px; background-color: #00a884; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">Reanudar con el asistente virtual</button>
+  </div>
+
+  <!-- Input -->
+  <div class="input-row">
+    <div class="emoji-btn">😊</div>
+    <input id="inp" type="text" placeholder="Mensaje" autocomplete="off" />
+    <button class="send-btn" id="sendBtn" title="Enviar">
+      <svg viewBox="0 0 24 24"><path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // ── Sesión fija para que aparezca como 999999999 en el CRM ──
+  const SESSION_ID = '999999999';
+
+  const msgsEl    = document.getElementById('msgs');
+  const inpEl     = document.getElementById('inp');
+  const sendBtn   = document.getElementById('sendBtn');
+  const typingEl  = document.getElementById('typing');
+  const pausedEl  = document.getElementById('pausedNotice');
+  const restartBtn= document.getElementById('restartBtn');
+  const statusTxt = document.getElementById('status-text');
+  const dateChip  = document.getElementById('dateChip');
+  const clockEl   = document.getElementById('clock');
+
+  // Reloj en tiempo real
+  function updateClock() {
+    const now = new Date();
+    clockEl.textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // Fecha del chip
+  dateChip.textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  function ts() {
+    return new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function addMsg(text, role) {
+    typingEl.classList.remove('show');
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    // Preserva saltos de línea y links
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    const linked = escaped.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#53bdeb;text-underline-offset:2px;">$1</a>');
+    div.innerHTML = linked.replace(/\n/g, '<br>') + `<span class="ts">${ts()}</span>`;
+    msgsEl.insertBefore(div, typingEl);
+    msgsEl.appendChild(typingEl);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function setBusy(busy) {
+    inpEl.disabled  = busy;
+    sendBtn.disabled = busy;
+    if (busy) {
+      typingEl.classList.add('show');
+      statusTxt.textContent = '● escribiendo...';
+      statusTxt.style.color = '#8696a0';
+    } else {
+      typingEl.classList.remove('show');
+      statusTxt.textContent = '● En línea — Coordinador Virtual';
+      statusTxt.style.color = '#00a884';
+    }
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  async function send(text) {
+    if (!text.trim()) return;
+    inpEl.value = '';
+    const isInicio = text === '__inicio__';
+    if (!isInicio) addMsg(text, 'user');
+    setBusy(true);
+    try {
+      const r = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: SESSION_ID, message: text })
+      });
+      const d = await r.json();
+
+      if (d.reply) {
+        addMsg(d.reply, 'bot');
+      } else if (d.reply === null) {
+        // Bot pausado por intervención humana
+        addMsg('Un asesor del equipo se va a comunicar con vos en breve. ¡Aguantá! 🤘', 'bot');
+      }
+
+      if (d.needsIntervention) {
+        pausedEl.classList.add('show');
+        inpEl.placeholder = 'Esperando asesor...';
+      }
+
+    } catch (e) {
+      addMsg('Disculpá, hubo un problema de conexión. Intentá de nuevo.', 'bot');
+    } finally {
+      setBusy(false);
+      if (!inpEl.disabled) inpEl.focus();
+    }
+  }
+
+  async function unpause() {
+    setBusy(true);
+    try {
+      const r = await fetch('/chat/unpause', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: SESSION_ID })
+      });
+      const d = await r.json();
+      if (d.success) {
+        pausedEl.classList.remove('show');
+        inpEl.placeholder = 'Mensaje';
+        addMsg('¡Acá estoy de vuelta! 😊 Decime, ¿en qué te puedo ayudar?', 'bot');
+      }
+    } catch (e) {
+      console.error(e);
+      addMsg('Disculpá, no se pudo reanudar. Intentá de nuevo.', 'bot');
+    } finally {
+      setBusy(false);
+      if (!inpEl.disabled) inpEl.focus();
+    }
+  }
+
+  restartBtn.addEventListener('click', unpause);
+  sendBtn.addEventListener('click', () => send(inpEl.value));
+  inpEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(inpEl.value); }
+  });
+
+  // Auto-saludo al cargar
+  window.addEventListener('load', () => {
+    setBusy(true);
+    setTimeout(() => send('__inicio__'), 600);
+  });
+</script>
+</body>
+</html>

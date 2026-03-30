@@ -7,7 +7,7 @@ import multer from 'multer';
 import { fileURLToPath } from 'url';
 
 import { initDB, pool } from './services/dbService.js';
-import { chatController } from './controllers/chatController.js';
+import { chatController, unpauseController } from './controllers/chatController.js';
 import { getConversationsList, getConversationHistory, updateConversation, sendManualMessage } from './controllers/conversationsController.js';
 
 dotenv.config();
@@ -66,12 +66,23 @@ app.get('/health', (req, res) => {
 
 // Chatbot Webhook Endpoint (Evolution API)
 app.post('/chat', chatController);
+app.post('/chat/unpause', unpauseController);
 
 // Conversations CRM Endpoints
 app.get('/conversations', getConversationsList);
 app.get('/conversations/:session_id', getConversationHistory);
 app.put('/conversations/:session_id', updateConversation);
 app.post('/conversations/:session_id/send', upload.single('file'), sendManualMessage);
+
+// Demo chat (simulador de celular, session_id fijo 999999999)
+app.get('/demo', (req, res) => {
+  res.sendFile(path.join(__dirname, '../demo.html'));
+});
+
+// Informe de flujos conversacionales (acceso directo, aislado del frontend)
+app.get('/informe', (req, res) => {
+  res.sendFile(path.join(__dirname, '../informe_flujos_bot.html'));
+});
 
 // Serve SPA route safely
 app.get('/', (req, res) => {

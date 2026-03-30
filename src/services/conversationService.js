@@ -30,3 +30,16 @@ export const saveSession = async (sessionId, history, unreadCount = 0, needsInte
         console.error('Error saving session:', error);
     }
 };
+
+export const unpauseSession = async (sessionId) => {
+    try {
+        await pool.query(
+            `UPDATE travelrock_conversations SET status = 'active', needs_intervention = false, unread_count = 0 WHERE session_id = $1`,
+            [sessionId]
+        );
+        return true;
+    } catch (error) {
+        console.error('Error unpausing session:', error);
+        return false;
+    }
+};
