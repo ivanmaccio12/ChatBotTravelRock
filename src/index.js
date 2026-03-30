@@ -76,6 +76,9 @@ app.post('/conversations/:session_id/send', upload.single('file'), sendManualMes
 
 // Demo chat (simulador de celular, session_id fijo 999999999)
 app.get('/demo', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.sendFile(path.join(__dirname, '../demo.html'));
 });
 
